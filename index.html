@@ -110,16 +110,16 @@
                 <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 5.69l5-4.5V21h-2V10h-2v11H7V1.19l5 4.5z"/></svg>
                 <span>Inicio</span>
             </button>
-            <button class="flex flex-col items-center text-gray-400 hover:text-white text-xs transition">
+            <button class="flex flex-col items-center text-gray-400 hover:text-white text-xs transition" onclick="handleExplore()">
                 <!-- Icono de Búsqueda (Explore) -->
                 <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zM9.5 14C7.57 14 6 12.43 6 10.5S7.57 7 9.5 7 13 8.57 13 10.5 11.43 14 9.5 14z"/></svg>
                 <span>Explorar</span>
             </button>
-            <button class="w-12 h-8 bg-white text-black rounded-lg flex items-center justify-center font-bold text-xl transition hover:bg-red-500 hover:text-white shadow-md shadow-gray-700">
+            <button class="w-12 h-8 bg-white text-black rounded-lg flex items-center justify-center font-bold text-xl transition hover:bg-red-500 hover:text-white shadow-md shadow-gray-700" onclick="handleUpload()">
                 <!-- Botón de Subida (Más prominente) -->
                 <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
             </button>
-            <button class="flex flex-col items-center text-gray-400 hover:text-white text-xs transition">
+            <button class="flex flex-col items-center text-gray-400 hover:text-white text-xs transition" onclick="handleInbox()">
                 <!-- Icono de Buzón (Inbox) -->
                 <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V8l8 5 8-5v10z"/></svg>
                 <span>Buzón</span>
@@ -160,7 +160,7 @@
 
                 <div id="login-section">
                     <button class="w-full py-3 mb-3 bg-red-600 hover:bg-red-700 rounded-full font-bold transition duration-200" onclick="handleAuthAction('login')">
-                        Iniciar Sesión (Supabase Mock)
+                        Iniciar Sesión (Mock User)
                     </button>
                     <button class="w-full py-3 bg-gray-600 hover:bg-gray-700 rounded-full font-bold transition duration-200" onclick="handleAuthAction('anon')">
                         Continuar como Invitado
@@ -198,14 +198,13 @@
         // =================================================================
         const SUPABASE_URL = 'https://fcpczyohzcgulbfpthuc.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZjcGN6eW9oemNndWxiZnB0aHVjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE0MDA4NzksImV4cCI6MjA3Njk3Njg3OX0.Ya3sJ2Hb0gr8pCg5CEheMDWGjSCAuPeoNcfANUTuwPk';
-
-        // Referencia a la tabla de videos de Supabase
         const SUPABASE_TABLE_NAME = 'videos'; 
+        const MOCK_USER_ID = '00000000-0000-0000-0000-000000000001'; // ID de usuario de prueba
 
         // Variables de Supabase
         let supabase;
-        // Estado de usuario: usaremos 'guest' si no hay sesión activa
         let currentUserId = null;
+        let likedVideoIds = new Set(); // Almacena IDs de videos a los que el usuario ha dado like
 
         // Elementos del DOM
         const videoFeed = document.getElementById('video-feed');
@@ -241,45 +240,69 @@
                 likes: 3400, comments: 112, shares: 50, isLikedByCurrentUser: false,
             }
         ];
-        let videoData = [...mockVideoData]; // Usar una copia mutable
+        let videoData = [...mockVideoData];
 
         // =================================================================
         // LÓGICA DE AUTENTICACIÓN (SUPABASE)
         // =================================================================
 
+        /**
+         * Obtiene los IDs de videos a los que el usuario ha dado like.
+         */
+        async function fetchLikedVideoIds(userId) {
+            // No intentar la consulta si es modo invitado (para optimizar)
+            if (!supabase || userId.startsWith('guest_')) {
+                likedVideoIds = new Set();
+                return;
+            }
+            try {
+                const { data, error } = await supabase
+                    .from('video_likes')
+                    .select('video_id')
+                    .eq('user_id', userId);
+
+                if (error) throw error;
+                
+                likedVideoIds = new Set(data.map(item => item.video_id));
+                console.log(`Usuario autenticado. Videos con like: ${likedVideoIds.size}`);
+
+            } catch (error) {
+                console.error("Error al obtener likes del usuario:", error);
+                // No mostrar alert para evitar spam, solo loguear el error
+            }
+        }
+
         async function initializeSupabase() {
             try {
-                // Inicializa el cliente Supabase
                 supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
                 console.log("Cliente Supabase inicializado y conectado.");
 
-                // Listener de cambios de estado de autenticación
-                supabase.auth.onAuthStateChange((event, session) => {
+                supabase.auth.onAuthStateChange(async (event, session) => {
                     if (session && session.user) {
                         currentUserId = session.user.id;
-                        console.log(`Sesión Supabase activa. User ID: ${currentUserId}`);
                     } else {
-                        // Usuario no autenticado o sesión cerrada. Generamos un ID de invitado.
-                        // Usamos un ID de invitado para la lógica de permisos
                         currentUserId = 'guest_' + Math.random().toString(36).substring(2, 9);
-                        console.log(`Usuario en modo invitado. ID: ${currentUserId}`);
                     }
+
+                    // 1. Obtener la lista de likes del usuario actual
+                    await fetchLikedVideoIds(currentUserId); 
+                    
+                    // 2. Actualizar UI y cargar feed
                     updateAuthUI();
-                    subscribeToVideoFeed(); // Carga datos después de definir el estado de auth
+                    subscribeToVideoFeed(); 
                 });
                 
-                // Para la carga inicial, revisa el estado de la sesión
+                // Cargar la sesión inicial
                 const { data: { session } } = await supabase.auth.getSession();
                 if (!session) {
-                    // Activa el estado de usuario invitado si no hay sesión
+                    currentUserId = 'guest_' + Math.random().toString(36).substring(2, 9);
                     updateAuthUI(); 
                     subscribeToVideoFeed();
                 }
 
             } catch (error) {
                 console.error("Error al inicializar Supabase:", error);
-                // Si falla Supabase, la app sigue funcionando con mock data
-                renderFeed(videoData);
+                renderFeed(videoData); // Fallback
             }
         }
 
@@ -290,7 +313,6 @@
             const loginSection = document.getElementById('login-section');
             const logoutSection = document.getElementById('logout-section');
             
-            // Un usuario está "logueado" si currentUserId no es un ID de invitado (ej: 'guest_...')
             const isLoggedIn = currentUserId && !currentUserId.startsWith('guest_');
 
             if (isLoggedIn) {
@@ -311,20 +333,24 @@
         }
 
         /**
-         * Maneja las acciones de Login/Logout/Anon. (Mock de Login/Anon).
+         * Maneja las acciones de Login/Logout/Anon.
          */
         async function handleAuthAction(action) {
             try {
                 if (action === 'logout') {
-                    // Cierre de sesión real de Supabase
                     const { error } = await supabase.auth.signOut();
                     if (error) throw error;
                     alertMessage('Sesión cerrada correctamente.', 'info');
                 } else if (action === 'login') {
-                    // NOTA: En producción, aquí implementarías signInWithOAuth o signInWithPassword
-                    alertMessage('Función de Login Mock: Implementa tu método de inicio de sesión de Supabase aquí.', 'info');
+                    // --- MOCK AUTHENTICATION SUCCESS ---
+                    alertMessage('Simulando inicio de sesión con Mock User.', 'info');
+                    // Establecer el ID de usuario de prueba y forzar la actualización de estado
+                    await fetchLikedVideoIds(MOCK_USER_ID);
+                    currentUserId = MOCK_USER_ID;
+                    updateAuthUI();
+                    subscribeToVideoFeed();
+                    // --- END MOCK ---
                 } else if (action === 'anon') {
-                    // El modo invitado ya está activo al usar la ANON KEY.
                     alertMessage('Continuando en modo Invitado.', 'info');
                 }
                 closeModal('auth-modal');
@@ -341,6 +367,40 @@
         });
 
         // =================================================================
+        // LÓGICA DE NAVEGACIÓN
+        // =================================================================
+
+        function handleExplore() {
+            alertMessage('Mostrando contenido popular y tendencias (Explorar).', 'info');
+        }
+
+        function handleUpload() {
+            if (currentUserId.startsWith('guest_')) {
+                alertMessage('Debes iniciar sesión para subir contenido.', 'error');
+                openModal('auth-modal');
+                return;
+            }
+            alertMessage('Abriendo formulario de subida de video...', 'info');
+        }
+
+        function handleInbox() {
+            if (currentUserId.startsWith('guest_')) {
+                alertMessage('Debes iniciar sesión para ver tu buzón.', 'error');
+                openModal('auth-modal');
+                return;
+            }
+            alertMessage('Cargando notificaciones y mensajes (Buzón).', 'info');
+        }
+
+        // Exponer funciones al scope global para que los botones onclick las vean
+        window.handleExplore = handleExplore;
+        window.handleUpload = handleUpload;
+        window.handleInbox = handleInbox;
+        window.handleAuthAction = handleAuthAction;
+        window.openComments = openComments; // <<--- FIX APLICADO
+        window.handleShare = handleShare;
+
+        // =================================================================
         // LÓGICA DE SUPABASE / INTERACCIÓN
         // =================================================================
 
@@ -349,29 +409,28 @@
          */
         async function subscribeToVideoFeed() {
             if (!supabase) {
-                renderFeed(videoData); // Fallback si la inicialización falló
+                renderFeed(videoData);
                 return;
             }
 
             try {
-                // Consulta simple para obtener todos los videos
                 const { data, error } = await supabase
                     .from(SUPABASE_TABLE_NAME)
                     .select('id, user_handle, description, music, video_url, likes, comments, shares');
 
                 if (error) throw error;
                 
-                // Mapear los datos de Supabase.
                 videoData = data.map(item => ({
                     id: item.id,
                     user: item.user_handle || 'Desconocido',
                     description: item.description || '',
                     music: item.music || 'Original Sound',
-                    video_url: item.video_url || mockVideoData[0].video_url, // Fallback URL de video
+                    video_url: item.video_url || mockVideoData[0].video_url, 
                     likes: item.likes || 0,
                     comments: item.comments || 0,
                     shares: item.shares || 0,
-                    isLikedByCurrentUser: false, 
+                    // Usar el Set de IDs para determinar si el usuario le dio like
+                    isLikedByCurrentUser: likedVideoIds.has(item.id), 
                 }));
                 
                 if (videoData.length === 0) {
@@ -384,7 +443,6 @@
 
             } catch (error) {
                 console.warn("Error al obtener videos de Supabase. Usando mock data. Error:", error.message);
-                // Fallback a mock data si la conexión o la tabla fallan
                 if (videoData.length === 0) videoData = mockVideoData; 
                 renderFeed(videoData);
             }
@@ -395,7 +453,7 @@
          */
         async function handleLike(videoId, likeIcon, countElement) {
             const isLoggedIn = currentUserId && !currentUserId.startsWith('guest_');
-            const userId = currentUserId; // Usamos el ID de usuario real o el de invitado
+            const userId = currentUserId;
 
             if (!isLoggedIn) {
                 alertMessage('Debes iniciar sesión para dar Me Gusta.', 'error');
@@ -406,12 +464,20 @@
             const video = videoData.find(v => v.id == videoId);
             if (!video) return;
 
-            let isCurrentlyLiked = video.isLikedByCurrentUser;
+            const isCurrentlyLiked = likedVideoIds.has(videoId); // Estado real basado en Set
             let likeDelta = isCurrentlyLiked ? -1 : 1;
 
-            // 1. Optimistic UI Update (Actualización inmediata en la interfaz)
-            video.isLikedByCurrentUser = !isCurrentlyLiked;
+            // 1. Optimistic UI Update & Local State Update
+            // Actualiza el Set localmente
+            if (!isCurrentlyLiked) {
+                likedVideoIds.add(videoId);
+            } else {
+                likedVideoIds.delete(videoId);
+            }
+
+            // Actualiza el objeto de datos y el contador
             video.likes += likeDelta;
+            video.isLikedByCurrentUser = !isCurrentlyLiked;
             
             countElement.textContent = formatNumber(video.likes);
             likeIcon.setAttribute('fill', !isCurrentlyLiked ? 'currentColor' : 'none');
@@ -423,25 +489,22 @@
             // 2. Transacción de Base de Datos (Supabase)
             if (supabase) {
                 try {
+                    // 2a. Gestionar la tabla video_likes (Insertar/Eliminar el registro del usuario)
                     if (!isCurrentlyLiked) {
-                        // Insertar like en la tabla de likes
                         const { error: insertError } = await supabase
                             .from('video_likes')
                             .insert([{ video_id: videoId, user_id: userId }]);
-
                         if (insertError) throw insertError;
                     } else {
-                        // Eliminar like de la tabla de likes
                         const { error: deleteError } = await supabase
                             .from('video_likes')
                             .delete()
                             .eq('video_id', videoId)
                             .eq('user_id', userId);
-
                         if (deleteError) throw deleteError;
                     }
 
-                    // Actualizar el contador de likes en la tabla 'videos' (Importante para el conteo global)
+                    // 2b. Actualizar el contador de likes en la tabla 'videos'
                     const { error: updateError } = await supabase
                         .from(SUPABASE_TABLE_NAME)
                         .update({ likes: video.likes })
@@ -455,27 +518,21 @@
                     console.error("Error al gestionar like en Supabase:", error.message);
                     alertMessage('Error al guardar Me Gusta. Intenta de nuevo.', 'error');
                     
-                    // 3. Revertir UI Update si falla
-                    video.isLikedByCurrentUser = isCurrentlyLiked;
+                    // 3. Revertir UI y estado local si falla
+                    if (!isCurrentlyLiked) {
+                        likedVideoIds.delete(videoId);
+                    } else {
+                        likedVideoIds.add(videoId);
+                    }
                     video.likes -= likeDelta;
+                    video.isLikedByCurrentUser = isCurrentlyLiked;
+
                     countElement.textContent = formatNumber(video.likes);
                     likeIcon.setAttribute('fill', isCurrentlyLiked ? 'currentColor' : 'none');
                     likeIcon.setAttribute('stroke', isCurrentlyLiked ? 'none' : 'currentColor');
                     likeIcon.classList.toggle('text-red-500', isCurrentlyLiked);
                 }
             }
-        }
-
-        /**
-         * Abre el modal de comentarios.
-         */
-        function openComments(videoId) {
-            if (currentUserId.startsWith('guest_')) {
-                 alertMessage('Debes iniciar sesión para ver comentarios.', 'error');
-                 openModal('auth-modal');
-                 return;
-            }
-            openModal('comments-modal');
         }
 
         /**
@@ -487,9 +544,23 @@
                  openModal('auth-modal');
                  return;
             }
+            document.execCommand('copy'); // Comando de copia
             alertMessage('¡Enlace del video copiado al portapapeles!', 'info');
         }
 
+        /**
+         * Abre el modal de comentarios.
+         */
+        function openComments(videoId) {
+            if (currentUserId.startsWith('guest_')) {
+                 alertMessage('Debes iniciar sesión para ver comentarios.', 'error');
+                 openModal('auth-modal');
+                 return;
+            }
+            // NOTA: Podrías cargar los comentarios reales de Supabase aquí antes de abrir el modal
+            openModal('comments-modal');
+        }
+        
         // =================================================================
         // LÓGICA DE REPRODUCCIÓN Y UTILIDADES
         // =================================================================
@@ -499,19 +570,17 @@
          */
         function tapVideo(videoElement) {
             if (videoElement.paused) {
-                // Se reanuda la reproducción. Se añade .catch() para manejar posibles errores
                 videoElement.play().catch(e => console.error("Error al intentar reproducir:", e));
-                showTemporaryIcon('pause'); // Muestra icono de pausa al reanudar
+                showTemporaryIcon('pause'); 
             } else {
                 videoElement.pause();
-                showTemporaryIcon('play'); // Muestra icono de play al pausar
+                showTemporaryIcon('play'); 
             }
 
             function showTemporaryIcon(action) {
                 playPauseIcon.querySelector('svg path').setAttribute('d', action === 'play' ? 'M8 5v14l11-7z' : 'M6 19h4V5H6v14zm8-14v14h4V5h-4z');
                 playPauseIcon.classList.add('show-icon');
                 
-                // Ocultar después de un breve periodo
                 setTimeout(() => {
                     playPauseIcon.classList.remove('show-icon');
                 }, 700);
@@ -560,7 +629,6 @@
             const modal = document.getElementById(id);
             if (modal) {
                 modal.style.display = 'flex';
-                // Pausa el video actual al abrir un modal
                 const currentVideo = document.querySelector('.video-container video.active-video');
                 if(currentVideo) currentVideo.pause();
 
@@ -575,7 +643,6 @@
             const modal = document.getElementById(id);
             if (modal) {
                 modal.style.display = 'none';
-                // Reanuda el video al cerrar un modal
                 const currentVideo = document.querySelector('.video-container video.active-video');
                  if(currentVideo && currentVideo.paused) currentVideo.play().catch(e => console.error("Error al intentar reanudar:", e));
 
@@ -596,48 +663,45 @@
             videoEl.className = 'video-element';
             videoEl.src = videoData.video_url; 
             videoEl.loop = true;
-            videoEl.muted = true; // Inicia en silencio
+            videoEl.muted = true; 
             videoEl.setAttribute('playsinline', true);
             videoEl.setAttribute('data-id', videoData.id);
 
-            // Añadir el listener para Pausar/Reproducir al tocar
             videoEl.addEventListener('click', () => tapVideo(videoEl));
 
             // Overlay (Información y Controles)
             const overlay = document.createElement('div');
-            overlay.className = 'overlay flex flex-col justify-end p-4';
+            overlay.className = 'overlay flex flex-col justify-end p-4'; 
 
-            // Contenido Inferior Izquierdo (Info del usuario/video)
-            const infoContainer = document.createElement('div');
-            infoContainer.className = 'flex-grow flex items-end justify-between';
-
-            // Usamos un ID de usuario fijo si no está logueado para que la interacción funcione
+            const contentWrapper = document.createElement('div');
+            contentWrapper.className = 'flex justify-between items-end w-full';
+            
             const likeActionId = videoData.id; 
 
-            const textInfo = `
-                <div class="text-white text-shadow-strong z-10 w-2/3">
-                    <p class="font-bold text-lg mb-1 hover:underline cursor-pointer">@${videoData.user}</p>
-                    <p class="text-sm mb-1">${videoData.description}</p>
-                    <p class="text-sm font-semibold flex items-center mt-2">
-                        <!-- Icono de Música -->
-                        <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3v10.55a4 4 0 1 0 2 2.76V5h4V3h-6z"/></svg>
-                        <span class="truncate">${videoData.music}</span>
-                    </p>
-                </div>
+            // 1. Contenido Inferior Izquierdo (Info del usuario/video)
+            const textInfo = document.createElement('div');
+            textInfo.className = 'text-white text-shadow-strong z-10 w-2/3';
+            textInfo.innerHTML = `
+                <p class="font-bold text-lg mb-1 hover:underline cursor-pointer">@${videoData.user}</p>
+                <p class="text-sm mb-1">${videoData.description}</p>
+                <p class="text-sm font-semibold flex items-center mt-2">
+                    <!-- Icono de Música -->
+                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3v10.55a4 4 0 1 0 2 2.76V5h4V3h-6z"/></svg>
+                    <span class="truncate">${videoData.music}</span>
+                </p>
             `;
-            infoContainer.innerHTML += textInfo;
+            contentWrapper.appendChild(textInfo);
 
-            // Contenido Inferior Derecho (Botones de acción)
+            // 2. Contenido Inferior Derecho (Botones de acción)
             const actionsContainer = document.createElement('div');
             actionsContainer.className = 'flex flex-col items-center space-y-5 z-10';
 
-            // Estado de Like
-            const isLiked = videoData.isLikedByCurrentUser || false;
+            const isLiked = videoData.isLikedByCurrentUser;
             const likeClass = isLiked ? 'text-red-500' : 'text-white';
             const isFilled = isLiked ? 'currentColor' : 'none';
             const isStroked = isLiked ? 'none' : 'currentColor';
 
-            actionsContainer.innerHTML += `
+            actionsContainer.innerHTML = `
                 <div class="flex flex-col items-center icon-btn" onclick="handleLike(${likeActionId}, this.querySelector('svg'), this.querySelector('span'))">
                     <svg class="w-8 h-8 ${likeClass} transition duration-150" fill="${isFilled}" stroke="${isStroked}" stroke-width="2" viewBox="0 0 24 24">
                         <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
@@ -657,11 +721,12 @@
                     ${videoData.user.charAt(0)}
                 </div>
             `;
+            contentWrapper.appendChild(actionsContainer);
 
+            overlay.appendChild(contentWrapper); 
+            
             container.appendChild(videoEl);
             container.appendChild(overlay);
-            overlay.appendChild(infoContainer);
-            overlay.appendChild(actionsContainer);
 
             return container;
         }
@@ -670,7 +735,6 @@
          * Renderiza el feed completo de videos.
          */
         function renderFeed(videos) {
-            // Pausar todos los videos antes de re-renderizar
             document.querySelectorAll('.video-element').forEach(v => v.pause());
 
             videoFeed.innerHTML = '';
@@ -678,13 +742,11 @@
                 videoFeed.appendChild(createVideoElement(video));
             });
 
-            // Reanuda el primer video y lo marca como activo
             const firstVideo = videoFeed.firstChild?.querySelector('video');
             if (firstVideo) {
-                 // Usa play() con muted=true para mejorar la compatibilidad de autoplay
                 firstVideo.play().catch(e => console.warn("Auto-reproducción bloqueada (tocar para iniciar).", e));
                 firstVideo.classList.add('active-video');
-                firstVideo.muted = false; // Desmuta el video activo
+                firstVideo.muted = false; 
             }
         }
 
@@ -711,7 +773,7 @@
                         video.play().catch(e => console.warn("Error al reproducir video:", e));
                         video.muted = false; 
                     }
-                    video.classList.add('active-video'); // Marca el video actual para referencia
+                    video.classList.add('active-video'); 
                 } else {
                     if (!video.paused) {
                         video.pause();
@@ -729,13 +791,11 @@
         window.addEventListener('load', () => {
             initializeSupabase();
             
-            // Si Supabase falla o tarda, renderiza el mock inicial
             if (!supabase) {
                 renderFeed(videoData);
             }
             
             videoFeed.addEventListener('scroll', handleScroll);
-            // Ejecuta el manejo de scroll al cargar para asegurar la reproducción inicial
             handleScroll(); 
         });
 
