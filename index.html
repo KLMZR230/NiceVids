@@ -162,9 +162,10 @@
                     <button class="w-full py-3 mb-3 bg-red-600 hover:bg-red-700 rounded-full font-bold transition duration-200" onclick="performLogin()">
                         Iniciar Sesión
                     </button>
-                    <button class="w-full py-3 mb-3 bg-red-900 hover:bg-red-800 rounded-full font-bold transition duration-200" onclick="alertMessage('Simulando registro. Usa el editor SQL de Supabase para crear usuarios reales.', 'info')">
-                        Registrarse (Mock)
+                    <button class="w-full py-3 mb-3 bg-red-900 hover:bg-red-800 rounded-full font-bold transition duration-200" onclick="performSignUp()">
+                        Registrarse
                     </button>
+                    
                     <button class="w-full py-3 bg-gray-600 hover:bg-gray-700 rounded-full font-bold transition duration-200" onclick="handleAuthAction('anon')">
                         Continuar como Invitado
                     </button>
@@ -307,7 +308,7 @@
                     await fetchLikedVideoIds(currentUserId); 
                     
                     updateAuthUI();
-                    await subscribeToVideoFeed(); // Se asegura de que se cargue el feed al cambiar de estado
+                    await subscribeToVideoFeed(); 
                 });
                 
                 const { data: { session } } = await supabase.auth.getSession();
@@ -346,6 +347,57 @@
                 if (loginSection) loginSection.classList.remove('hidden');
                 if (logoutSection) logoutSection.classList.add('hidden');
                 if (currentUserIdElement) currentUserIdElement.textContent = 'Modo Invitado';
+            }
+        }
+
+        /**
+         * Maneja el Registro (Sign Up) real de Supabase.
+         */
+        async function performSignUp() {
+            const email = document.getElementById('auth-email').value;
+            const password = document.getElementById('auth-password').value;
+
+            if (!email || !password || password.length < 6) {
+                alertMessage('Ingresa un correo válido y una contraseña (mínimo 6 caracteres).', 'error');
+                return;
+            }
+            
+            uploadStatusElement.textContent = "Registrando usuario...";
+            uploadStatusElement.classList.remove('hidden');
+
+            try {
+                // Usa supabase.auth.signUp
+                const { data, error } = await supabase.auth.signUp({
+                    email,
+                    password,
+                    options: {
+                        // Opcional: puedes agregar metadata del usuario aquí
+                        data: {
+                            user_handle: email.split('@')[0] 
+                        }
+                    }
+                });
+
+                if (error) {
+                    throw error;
+                }
+
+                if (data.user && data.user.identities && data.user.identities.length > 0) {
+                    // Si el usuario se registra e inicia sesión automáticamente (comportamiento por defecto)
+                    alertMessage('¡Registro exitoso! Sesión iniciada.', 'success');
+                    closeModal('auth-modal');
+                } else {
+                    // Si Supabase requiere confirmación por correo (Revisa tu configuración de Auth > Settings)
+                    alertMessage('¡Registro exitoso! Revisa tu correo electrónico para confirmar tu cuenta.', 'info');
+                    closeModal('auth-modal');
+                }
+
+            } catch (error) {
+                console.error(`Error de Registro:`, error);
+                const errorMessage = error.message.includes('User already registered') ? 'Este correo ya está registrado.' : `Error: ${error.message}`;
+                alertMessage(errorMessage, 'error');
+            } finally {
+                uploadStatusElement.classList.add('hidden');
             }
         }
 
@@ -519,8 +571,9 @@
         window.handleInbox = handleInbox;
         window.handleAuthAction = handleAuthAction;
         window.performLogin = performLogin;
+        window.performSignUp = performSignUp; // EXPONER NUEVA FUNCIÓN
         window.openUploadModal = openUploadModal;
-        window.uploadVideo = uploadVideo; // Nueva función de subida
+        window.uploadVideo = uploadVideo; 
         window.openComments = openComments; 
         window.handleShare = handleShare;
 
@@ -695,7 +748,6 @@
             }
 
             function showTemporaryIcon(action) {
-                // Selecciona la ruta del SVG del icono central de Play/Pause
                 playPauseIcon.querySelector('svg path').setAttribute('d', action === 'play' ? 'M8 5v14l11-7z' : 'M6 19h4V5H6v14zm8-14v14h4V5h-4z');
                 playPauseIcon.classList.add('show-icon');
                 
@@ -862,10 +914,8 @@
             // 2. Intenta reproducir el primer video y marcarlo como activo.
             const firstVideo = videoFeed.firstChild?.querySelector('video');
             if (firstVideo) {
-                // Configuración inicial para el primer video
-                firstVideo.muted = false; // Desmutear el primero para que se escuche si se reproduce
+                firstVideo.muted = false; 
                 firstVideo.classList.add('active-video');
-                // Intentar la reproducción (puede ser bloqueada por el navegador)
                 firstVideo.play().catch(e => console.warn("Auto-reproducción bloqueada (tocar para iniciar).", e));
             }
         }
@@ -886,28 +936,27 @@
 
                 const isVisibleAndCentered = Math.abs(viewportCenter - containerCenter) < rect.height / 3;
                 
-                // Remover la clase active-video por defecto
                 video.classList.remove('active-video');
 
                 if (isVisibleAndCentered) {
                     if (video.paused) {
                         video.play().catch(e => console.warn("Error al reproducir video:", e));
                     }
-                    video.muted = false; // El video central está desmuteado
+                    video.muted = false; 
                     video.classList.add('active-video'); 
                 } else {
                     if (!video.paused) {
                         video.pause();
                         video.currentTime = 0;
                     }
-                    video.muted = true; // El video fuera del centro está muteado
+                    video.muted = true; 
                 }
             });
         }
 
 
         // =================================================================
-        // INICIALIZACIÓN (BLOQUE CORREGIDO)
+        // INICIALIZACIÓN
         // =================================================================
 
         window.addEventListener('load', async () => {
@@ -918,9 +967,6 @@
             videoFeed.addEventListener('scroll', handleScroll);
 
             // 3. Llama a handleScroll una vez para asegurar que el video inicial se reproduzca 
-            //    y se establezca el estado correctamente después de renderFeed().
-            //    Esto reemplaza la lógica de reproducción del primer video en renderFeed
-            //    con la lógica estandarizada de scroll.
             handleScroll(); 
         });
 
