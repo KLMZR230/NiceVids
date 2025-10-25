@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VideoApp Móvil - Profesional</title>
-    <!-- Carga de Tailwind CSS para un diseño responsivo y moderno -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Configuración para usar la fuente Inter -->
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
         body {
@@ -97,10 +95,8 @@
 </head>
 <body class="text-white">
 
-    <!-- Contenedor Principal de la Aplicación -->
     <div id="app" class="flex flex-col h-screen">
 
-        <!-- HEADER (Siguiendo | Para Ti) - Más profesional -->
         <header class="fixed top-0 w-full z-20 flex justify-center p-3">
             <div class="text-shadow-strong">
                 <span class="text-gray-400 font-semibold mx-4 cursor-pointer hover:text-white transition">Siguiendo</span>
@@ -108,44 +104,34 @@
             </div>
         </header>
 
-        <!-- FEED DE VIDEOS (Contenido Principal) -->
         <div id="video-feed" class="flex-grow">
             <div class="video-container flex items-center justify-center">
                 <p class="text-xl">Cargando el feed...</p>
             </div>
         </div>
 
-        <!-- BARRA DE NAVEGACIÓN INFERIOR -->
         <nav id="bottom-nav" class="flex justify-around items-center h-14 bg-black/90 border-t border-gray-800 fixed bottom-0 w-full z-10 backdrop-blur-sm">
             <button class="flex flex-col items-center text-white text-xs font-bold transition">
-                <!-- Icono de Casa (Home) - Activo -->
                 <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 5.69l5-4.5V21h-2V10h-2v11H7V1.19l5 4.5z"/></svg>
                 <span>Inicio</span>
             </button>
             <button class="flex flex-col items-center text-gray-400 hover:text-white text-xs transition" onclick="handleExplore()">
-                <!-- Icono de Búsqueda (Explore) -->
                 <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zM9.5 14C7.57 14 6 12.43 6 10.5S7.57 7 9.5 7 13 8.57 13 10.5 11.43 14 9.5 14z"/></svg>
                 <span>Explorar</span>
             </button>
             <button class="w-12 h-8 bg-white text-black rounded-lg flex items-center justify-center font-bold text-xl transition hover:bg-red-500 hover:text-white shadow-md shadow-gray-700" onclick="openUploadModal()">
-                <!-- Botón de Subida (Más prominente) -->
                 <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
             </button>
             <button class="flex flex-col items-center text-gray-400 hover:text-white text-xs transition" onclick="handleInbox()">
-                <!-- Icono de Buzón (Inbox) -->
                 <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V8l8 5 8-5v10z"/></svg>
                 <span>Buzón</span>
             </button>
             <button id="profile-btn" class="flex flex-col items-center text-gray-400 hover:text-white text-xs transition">
-                <!-- Icono de Perfil (Profile) -->
                 <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
                 <span id="auth-status">Perfil</span>
             </button>
         </nav>
 
-        <!-- Modales de la Aplicación -->
-
-        <!-- 1. Modal de Comentarios -->
         <div id="comments-modal" class="fixed inset-0 bg-black bg-opacity-80 z-20 hidden items-end" onclick="closeModal('comments-modal')">
             <div class="bg-gray-900 w-full h-1/2 p-4 rounded-t-xl animate-slide-up" onclick="event.stopPropagation()">
                 <div class="flex justify-between items-center mb-4">
@@ -164,7 +150,6 @@
             </div>
         </div>
 
-        <!-- 2. Modal de Autenticación (Login/Logout) -->
         <div id="auth-modal" class="fixed inset-0 bg-black bg-opacity-80 z-30 hidden items-center justify-center" onclick="closeModal('auth-modal')">
             <div class="bg-gray-900 w-11/12 max-w-sm p-6 rounded-xl shadow-2xl animate-fade-in" onclick="event.stopPropagation()">
                 <h3 class="text-2xl font-bold mb-4 text-center">Gestión de Cuenta</h3>
@@ -196,7 +181,6 @@
             </div>
         </div>
         
-        <!-- 3. Modal de Subida de Videos -->
         <div id="upload-modal" class="fixed inset-0 bg-black bg-opacity-80 z-40 hidden items-center justify-center" onclick="closeModal('upload-modal')">
             <div class="bg-gray-900 w-11/12 max-w-lg p-6 rounded-xl shadow-2xl animate-fade-in" onclick="event.stopPropagation()">
                 <h3 class="text-2xl font-bold mb-6 text-center">Subir Nuevo Video</h3>
@@ -218,9 +202,7 @@
         </div>
 
 
-        <!-- Icono central de Play/Pause (invisible por defecto) -->
         <div id="play-pause-icon" class="fixed inset-0 flex items-center justify-center z-40 pointer-events-none">
-            <!-- Icono de Play (triángulo) SVG -->
             <svg class="w-20 h-20 text-white" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M8 5v14l11-7z"/>
             </svg>
@@ -228,7 +210,6 @@
 
     </div>
 
-    <!-- Supabase Imports y Lógica Principal -->
     <script type="module">
         // Importación del cliente de Supabase
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.43.2/+esm';
@@ -326,14 +307,14 @@
                     await fetchLikedVideoIds(currentUserId); 
                     
                     updateAuthUI();
-                    subscribeToVideoFeed(); 
+                    await subscribeToVideoFeed(); // Se asegura de que se cargue el feed al cambiar de estado
                 });
                 
                 const { data: { session } } = await supabase.auth.getSession();
                 if (!session) {
                     currentUserId = 'guest_' + Math.random().toString(36).substring(2, 9);
                     updateAuthUI(); 
-                    subscribeToVideoFeed();
+                    await subscribeToVideoFeed();
                 }
 
             } catch (error) {
@@ -714,6 +695,7 @@
             }
 
             function showTemporaryIcon(action) {
+                // Selecciona la ruta del SVG del icono central de Play/Pause
                 playPauseIcon.querySelector('svg path').setAttribute('d', action === 'play' ? 'M8 5v14l11-7z' : 'M6 19h4V5H6v14zm8-14v14h4V5h-4z');
                 playPauseIcon.classList.add('show-icon');
                 
@@ -821,7 +803,6 @@
                 <p class="font-bold text-lg mb-1 hover:underline cursor-pointer">@${videoData.user}</p>
                 <p class="text-sm mb-1">${videoData.description}</p>
                 <p class="text-sm font-semibold flex items-center mt-2">
-                    <!-- Icono de Música -->
                     <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3v10.55a4 4 0 1 0 2 2.76V5h4V3h-6z"/></svg>
                     <span class="truncate">${videoData.music}</span>
                 </p>
@@ -853,7 +834,6 @@
                     <span class="text-xs font-semibold mt-1">${formatNumber(videoData.shares)}</span>
                 </div>
                 <div class="w-10 h-10 bg-red-500 rounded-full border-2 border-white cursor-pointer hover:scale-105 transition duration-150 flex items-center justify-center text-xs font-bold shadow-lg">
-                    <!-- Placeholder de Foto de Perfil con color de marca -->
                     ${videoData.user.charAt(0)}
                 </div>
             `;
@@ -871,6 +851,7 @@
          * Renderiza el feed completo de videos.
          */
         function renderFeed(videos) {
+            // 1. Pausa todos los videos antes de renderizar (limpieza)
             document.querySelectorAll('.video-element').forEach(v => v.pause());
 
             videoFeed.innerHTML = '';
@@ -878,11 +859,14 @@
                 videoFeed.appendChild(createVideoElement(video));
             });
 
+            // 2. Intenta reproducir el primer video y marcarlo como activo.
             const firstVideo = videoFeed.firstChild?.querySelector('video');
             if (firstVideo) {
-                firstVideo.play().catch(e => console.warn("Auto-reproducción bloqueada (tocar para iniciar).", e));
+                // Configuración inicial para el primer video
+                firstVideo.muted = false; // Desmutear el primero para que se escuche si se reproduce
                 firstVideo.classList.add('active-video');
-                firstVideo.muted = false; 
+                // Intentar la reproducción (puede ser bloqueada por el navegador)
+                firstVideo.play().catch(e => console.warn("Auto-reproducción bloqueada (tocar para iniciar).", e));
             }
         }
 
@@ -901,126 +885,42 @@
                 const containerCenter = videoFeed.scrollTop + rect.top + rect.height / 2;
 
                 const isVisibleAndCentered = Math.abs(viewportCenter - containerCenter) < rect.height / 3;
-
+                
+                // Remover la clase active-video por defecto
                 video.classList.remove('active-video');
 
                 if (isVisibleAndCentered) {
                     if (video.paused) {
                         video.play().catch(e => console.warn("Error al reproducir video:", e));
-                        video.muted = false; 
                     }
+                    video.muted = false; // El video central está desmuteado
                     video.classList.add('active-video'); 
                 } else {
                     if (!video.paused) {
                         video.pause();
                         video.currentTime = 0;
-                        video.muted = true;
                     }
+                    video.muted = true; // El video fuera del centro está muteado
                 }
             });
         }
 
-        // =================================================================
-        // LÓGICA DE REPRODUCCIÓN Y UTILIDADES
-        // =================================================================
-
-        /**
-         * Maneja el tap/clic en el video para Pausar/Reproducir.
-         */
-        const tapVideo = (videoElement) => { 
-            if (videoElement.paused) {
-                videoElement.play().catch(e => console.error("Error al intentar reproducir:", e));
-                showTemporaryIcon('pause'); 
-            } else {
-                videoElement.pause();
-                showTemporaryIcon('play'); 
-            }
-
-            function showTemporaryIcon(action) {
-                playPauseIcon.querySelector('svg path').setAttribute('d', action === 'play' ? 'M8 5v14l11-7z' : 'M6 19h4V5H6v14zm8-14v14h4V5h-4z');
-                playPauseIcon.classList.add('show-icon');
-                
-                setTimeout(() => {
-                    playPauseIcon.classList.remove('show-icon');
-                }, 700);
-            }
-        }
-
-
-        /**
-         * Formatea números grandes a formato legible (e.g., 1200 -> 1.2K).
-         */
-        function formatNumber(num) {
-            if (num === null || num === undefined) return '0';
-            if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
-            if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
-            return num.toString();
-        }
-
-        /**
-         * Muestra un mensaje temporal tipo 'Toast' en la parte inferior.
-         */
-        function alertMessage(message, type = 'success') {
-            const id = 'temp-alert';
-            let alertBox = document.getElementById(id);
-            if (!alertBox) {
-                alertBox = document.createElement('div');
-                alertBox.id = id;
-                document.body.appendChild(alertBox);
-            }
-
-            let bgColor = type === 'error' ? 'bg-red-700' : (type === 'info' ? 'bg-blue-600' : 'bg-green-600');
-
-            alertBox.className = `fixed bottom-20 left-1/2 transform -translate-x-1/2 px-5 py-3 rounded-full shadow-xl text-white font-semibold transition-opacity duration-300 z-50 opacity-100 ${bgColor}`;
-            alertBox.textContent = message;
-
-            setTimeout(() => {
-                alertBox.classList.remove('opacity-100');
-                alertBox.classList.add('opacity-0');
-                setTimeout(() => alertBox.remove(), 300);
-            }, 2500);
-        }
-
-        /**
-         * Abre un modal.
-         */
-        function openModal(id) {
-            const modal = document.getElementById(id);
-            if (modal) {
-                modal.style.display = 'flex';
-                const currentVideo = document.querySelector('.video-container video.active-video');
-                if(currentVideo) currentVideo.pause();
-
-                document.body.classList.add('overflow-hidden');
-            }
-        }
-
-        /**
-         * Cierra un modal.
-         */
-        function closeModal(id) {
-            const modal = document.getElementById(id);
-            if (modal) {
-                modal.style.display = 'none';
-                const currentVideo = document.querySelector('.video-container video.active-video');
-                 if(currentVideo && currentVideo.paused) currentVideo.play().catch(e => console.error("Error al intentar reanudar:", e));
-
-                document.body.classList.remove('overflow-hidden');
-            }
-        }
 
         // =================================================================
-        // INICIALIZACIÓN
+        // INICIALIZACIÓN (BLOQUE CORREGIDO)
         // =================================================================
 
-        window.addEventListener('load', () => {
-            initializeSupabase();
+        window.addEventListener('load', async () => {
+            // 1. Inicializa Supabase y carga los datos de video
+            await initializeSupabase();
             
-            if (!supabase) {
-                renderFeed(videoData);
-            }
-            
+            // 2. Adjunta el event listener de scroll DESPUÉS de cargar los videos
             videoFeed.addEventListener('scroll', handleScroll);
+
+            // 3. Llama a handleScroll una vez para asegurar que el video inicial se reproduzca 
+            //    y se establezca el estado correctamente después de renderFeed().
+            //    Esto reemplaza la lógica de reproducción del primer video en renderFeed
+            //    con la lógica estandarizada de scroll.
             handleScroll(); 
         });
 
