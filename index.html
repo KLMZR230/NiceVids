@@ -366,12 +366,10 @@
             uploadStatusElement.classList.remove('hidden');
 
             try {
-                // Usa supabase.auth.signUp
                 const { data, error } = await supabase.auth.signUp({
                     email,
                     password,
                     options: {
-                        // Opcional: puedes agregar metadata del usuario aquí
                         data: {
                             user_handle: email.split('@')[0] 
                         }
@@ -383,11 +381,9 @@
                 }
 
                 if (data.user && data.user.identities && data.user.identities.length > 0) {
-                    // Si el usuario se registra e inicia sesión automáticamente (comportamiento por defecto)
                     alertMessage('¡Registro exitoso! Sesión iniciada.', 'success');
                     closeModal('auth-modal');
                 } else {
-                    // Si Supabase requiere confirmación por correo (Revisa tu configuración de Auth > Settings)
                     alertMessage('¡Registro exitoso! Revisa tu correo electrónico para confirmar tu cuenta.', 'info');
                     closeModal('auth-modal');
                 }
@@ -565,17 +561,6 @@
             }
             alertMessage('Cargando notificaciones y mensajes (Buzón).', 'info');
         }
-
-        // Exponer funciones al scope global
-        window.handleExplore = handleExplore;
-        window.handleInbox = handleInbox;
-        window.handleAuthAction = handleAuthAction;
-        window.performLogin = performLogin;
-        window.performSignUp = performSignUp; // EXPONER NUEVA FUNCIÓN
-        window.openUploadModal = openUploadModal;
-        window.uploadVideo = uploadVideo; 
-        window.openComments = openComments; 
-        window.handleShare = handleShare;
 
         // =================================================================
         // LÓGICA DE SUPABASE / INTERACCIÓN
@@ -953,7 +938,24 @@
                 }
             });
         }
+        
+        // =================================================================
+        // EXPOSICIÓN GLOBAL DE FUNCIONES (Corrección del error 'is not defined')
+        // =================================================================
 
+        window.handleExplore = handleExplore;
+        window.handleInbox = handleInbox;
+        window.handleAuthAction = handleAuthAction;
+        window.performLogin = performLogin;
+        window.performSignUp = performSignUp;
+        window.openUploadModal = openUploadModal;
+        window.uploadVideo = uploadVideo; 
+        window.openComments = openComments; 
+        window.handleShare = handleShare;
+        
+        // CORRECCIÓN: Exponemos openModal y closeModal
+        window.openModal = openModal;
+        window.closeModal = closeModal; 
 
         // =================================================================
         // INICIALIZACIÓN
