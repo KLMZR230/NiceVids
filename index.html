@@ -81,6 +81,18 @@
         .text-shadow-strong {
             text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7), 0 0 15px rgba(0, 0, 0, 0.4);
         }
+        .loading-spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #fff;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body class="text-white">
@@ -115,7 +127,7 @@
                 <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zM9.5 14C7.57 14 6 12.43 6 10.5S7.57 7 9.5 7 13 8.57 13 10.5 11.43 14 9.5 14z"/></svg>
                 <span>Explorar</span>
             </button>
-            <button class="w-12 h-8 bg-white text-black rounded-lg flex items-center justify-center font-bold text-xl transition hover:bg-red-500 hover:text-white shadow-md shadow-gray-700" onclick="handleUpload()">
+            <button class="w-12 h-8 bg-white text-black rounded-lg flex items-center justify-center font-bold text-xl transition hover:bg-red-500 hover:text-white shadow-md shadow-gray-700" onclick="openUploadModal()">
                 <!-- Botón de Subida (Más prominente) -->
                 <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
             </button>
@@ -159,8 +171,14 @@
                 <p class="text-gray-400 text-center mb-6">Usa tu cuenta para interactuar y personalizar tu feed.</p>
 
                 <div id="login-section">
-                    <button class="w-full py-3 mb-3 bg-red-600 hover:bg-red-700 rounded-full font-bold transition duration-200" onclick="handleAuthAction('login')">
-                        Iniciar Sesión (Mock User)
+                    <input type="email" id="auth-email" placeholder="Correo Electrónico" class="w-full p-3 mb-3 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500" value="test@example.com">
+                    <input type="password" id="auth-password" placeholder="Contraseña" class="w-full p-3 mb-6 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500" value="password123">
+
+                    <button class="w-full py-3 mb-3 bg-red-600 hover:bg-red-700 rounded-full font-bold transition duration-200" onclick="performLogin()">
+                        Iniciar Sesión
+                    </button>
+                    <button class="w-full py-3 mb-3 bg-red-900 hover:bg-red-800 rounded-full font-bold transition duration-200" onclick="alertMessage('Simulando registro. Usa el editor SQL de Supabase para crear usuarios reales.', 'info')">
+                        Registrarse (Mock)
                     </button>
                     <button class="w-full py-3 bg-gray-600 hover:bg-gray-700 rounded-full font-bold transition duration-200" onclick="handleAuthAction('anon')">
                         Continuar como Invitado
@@ -178,6 +196,28 @@
             </div>
         </div>
         
+        <!-- 3. Modal de Subida de Videos -->
+        <div id="upload-modal" class="fixed inset-0 bg-black bg-opacity-80 z-40 hidden items-center justify-center" onclick="closeModal('upload-modal')">
+            <div class="bg-gray-900 w-11/12 max-w-lg p-6 rounded-xl shadow-2xl animate-fade-in" onclick="event.stopPropagation()">
+                <h3 class="text-2xl font-bold mb-6 text-center">Subir Nuevo Video</h3>
+                
+                <input type="file" id="video-file-input" accept="video/mp4,video/quicktime" class="w-full p-3 mb-4 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 border border-dashed border-gray-600">
+                
+                <input type="text" id="video-description-input" placeholder="Descripción del video (p. ej., #viaje #tutorial)" class="w-full p-3 mb-4 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500">
+                
+                <input type="text" id="video-music-input" placeholder="Música / Sonido Original" class="w-full p-3 mb-6 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500" value="Música Custom">
+
+                <button id="upload-btn" class="w-full py-3 bg-red-600 hover:bg-red-700 rounded-full font-bold transition duration-200 flex items-center justify-center" onclick="uploadVideo()">
+                    Subir Video
+                </button>
+                
+                <p id="upload-status" class="text-center text-sm mt-3 text-gray-400 hidden"></p>
+
+                <button class="absolute top-3 right-3 text-gray-400 text-3xl" onclick="closeModal('upload-modal')">&times;</button>
+            </div>
+        </div>
+
+
         <!-- Icono central de Play/Pause (invisible por defecto) -->
         <div id="play-pause-icon" class="fixed inset-0 flex items-center justify-center z-40 pointer-events-none">
             <!-- Icono de Play (triángulo) SVG -->
@@ -199,12 +239,12 @@
         const SUPABASE_URL = 'https://fcpczyohzcgulbfpthuc.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZjcGN6eW9oemNndWxiZnB0aHVjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE0MDA4NzksImV4cCI6MjA3Njk3Njg3OX0.Ya3sJ2Hb0gr8pCg5CEheMDWGjSCAuPeoNcfANUTuwPk';
         const SUPABASE_TABLE_NAME = 'videos'; 
-        const MOCK_USER_ID = '00000000-0000-0000-0000-000000000001'; // ID de usuario de prueba
+        const SUPABASE_STORAGE_BUCKET = 'videos-bucket'; // Asumiendo este nombre de bucket
 
         // Variables de Supabase
         let supabase;
         let currentUserId = null;
-        let likedVideoIds = new Set(); // Almacena IDs de videos a los que el usuario ha dado like
+        let likedVideoIds = new Set(); 
 
         // Elementos del DOM
         const videoFeed = document.getElementById('video-feed');
@@ -212,6 +252,8 @@
         const profileBtn = document.getElementById('profile-btn');
         const playPauseIcon = document.getElementById('play-pause-icon');
         const currentUserIdElement = document.getElementById('current-user-id');
+        const uploadStatusElement = document.getElementById('upload-status');
+        const uploadBtn = document.getElementById('upload-btn');
 
         // Mock de datos de videos (URLs directas y funcionales)
         const mockVideoData = [
@@ -250,7 +292,6 @@
          * Obtiene los IDs de videos a los que el usuario ha dado like.
          */
         async function fetchLikedVideoIds(userId) {
-            // No intentar la consulta si es modo invitado (para optimizar)
             if (!supabase || userId.startsWith('guest_')) {
                 likedVideoIds = new Set();
                 return;
@@ -264,11 +305,9 @@
                 if (error) throw error;
                 
                 likedVideoIds = new Set(data.map(item => item.video_id));
-                console.log(`Usuario autenticado. Videos con like: ${likedVideoIds.size}`);
 
             } catch (error) {
                 console.error("Error al obtener likes del usuario:", error);
-                // No mostrar alert para evitar spam, solo loguear el error
             }
         }
 
@@ -284,15 +323,12 @@
                         currentUserId = 'guest_' + Math.random().toString(36).substring(2, 9);
                     }
 
-                    // 1. Obtener la lista de likes del usuario actual
                     await fetchLikedVideoIds(currentUserId); 
                     
-                    // 2. Actualizar UI y cargar feed
                     updateAuthUI();
                     subscribeToVideoFeed(); 
                 });
                 
-                // Cargar la sesión inicial
                 const { data: { session } } = await supabase.auth.getSession();
                 if (!session) {
                     currentUserId = 'guest_' + Math.random().toString(36).substring(2, 9);
@@ -302,7 +338,7 @@
 
             } catch (error) {
                 console.error("Error al inicializar Supabase:", error);
-                renderFeed(videoData); // Fallback
+                renderFeed(videoData);
             }
         }
 
@@ -333,7 +369,40 @@
         }
 
         /**
-         * Maneja las acciones de Login/Logout/Anon.
+         * Maneja el login real de Supabase con Email y Contraseña.
+         */
+        async function performLogin() {
+            const email = document.getElementById('auth-email').value;
+            const password = document.getElementById('auth-password').value;
+
+            if (!email || !password) {
+                alertMessage('Ingresa correo y contraseña.', 'error');
+                return;
+            }
+            
+            uploadStatusElement.textContent = "Iniciando sesión...";
+            uploadStatusElement.classList.remove('hidden');
+
+            try {
+                const { error } = await supabase.auth.signInWithPassword({ email, password });
+
+                if (error) {
+                    throw error;
+                }
+                
+                alertMessage('¡Sesión iniciada con éxito!', 'success');
+                closeModal('auth-modal');
+
+            } catch (error) {
+                console.error(`Error de inicio de sesión:`, error);
+                alertMessage(`Error: ${error.message}`, 'error');
+            } finally {
+                uploadStatusElement.classList.add('hidden');
+            }
+        }
+
+        /**
+         * Maneja las acciones de Logout/Anon.
          */
         async function handleAuthAction(action) {
             try {
@@ -341,15 +410,6 @@
                     const { error } = await supabase.auth.signOut();
                     if (error) throw error;
                     alertMessage('Sesión cerrada correctamente.', 'info');
-                } else if (action === 'login') {
-                    // --- MOCK AUTHENTICATION SUCCESS ---
-                    alertMessage('Simulando inicio de sesión con Mock User.', 'info');
-                    // Establecer el ID de usuario de prueba y forzar la actualización de estado
-                    await fetchLikedVideoIds(MOCK_USER_ID);
-                    currentUserId = MOCK_USER_ID;
-                    updateAuthUI();
-                    subscribeToVideoFeed();
-                    // --- END MOCK ---
                 } else if (action === 'anon') {
                     alertMessage('Continuando en modo Invitado.', 'info');
                 }
@@ -365,6 +425,96 @@
             e.preventDefault();
             openModal('auth-modal');
         });
+        
+        // =================================================================
+        // LÓGICA DE SUBIDA DE VIDEOS
+        // =================================================================
+
+        function openUploadModal() {
+            if (currentUserId.startsWith('guest_')) {
+                alertMessage('Debes iniciar sesión para subir contenido.', 'error');
+                openModal('auth-modal');
+                return;
+            }
+            // Limpiar campos antes de abrir
+            document.getElementById('video-file-input').value = '';
+            document.getElementById('video-description-input').value = '';
+            document.getElementById('video-music-input').value = 'Música Custom';
+            uploadStatusElement.classList.add('hidden');
+            openModal('upload-modal');
+        }
+
+        async function uploadVideo() {
+            const fileInput = document.getElementById('video-file-input');
+            const description = document.getElementById('video-description-input').value;
+            const music = document.getElementById('video-music-input').value;
+            const file = fileInput.files[0];
+
+            if (!file || !description) {
+                alertMessage('Por favor, selecciona un video y añade una descripción.', 'error');
+                return;
+            }
+            if (!currentUserId || currentUserId.startsWith('guest_')) {
+                alertMessage('Error: No hay usuario autenticado para subir el video.', 'error');
+                return;
+            }
+
+            // Mostrar estado de carga
+            uploadStatusElement.textContent = "Subiendo archivo... (0%)";
+            uploadStatusElement.classList.remove('hidden');
+            uploadBtn.innerHTML = '<div class="loading-spinner"></div>';
+            uploadBtn.disabled = true;
+
+            const fileExtension = file.name.split('.').pop();
+            const fileName = `${currentUserId}/${Date.now()}.${fileExtension}`; 
+
+            try {
+                // 1. Subir a Supabase Storage
+                const { data: storageData, error: storageError } = await supabase.storage
+                    .from(SUPABASE_STORAGE_BUCKET)
+                    .upload(fileName, file, {
+                        cacheControl: '3600',
+                        upsert: false
+                    });
+
+                if (storageError) throw storageError;
+
+                // 2. Obtener URL pública
+                const { data: publicUrlData } = supabase.storage
+                    .from(SUPABASE_STORAGE_BUCKET)
+                    .getPublicUrl(fileName);
+                
+                const videoUrl = publicUrlData.publicUrl;
+
+                // 3. Insertar metadata en la tabla 'videos'
+                const { error: dbError } = await supabase
+                    .from(SUPABASE_TABLE_NAME)
+                    .insert([{
+                        user_id: currentUserId,
+                        user_handle: 'UsuarioLogueado', // Debería obtenerse del perfil
+                        description: description,
+                        music: music,
+                        video_url: videoUrl,
+                        likes: 0,
+                        comments: 0,
+                        shares: 0
+                    }]);
+                
+                if (dbError) throw dbError;
+
+                alertMessage('¡Video subido y publicado con éxito!', 'success');
+                closeModal('upload-modal');
+
+            } catch (error) {
+                console.error("Error de subida:", error);
+                alertMessage(`Fallo en la subida: ${error.message}. Verifica permisos de Storage.`, 'error');
+            } finally {
+                uploadBtn.innerHTML = 'Subir Video';
+                uploadBtn.disabled = false;
+                uploadStatusElement.classList.add('hidden');
+            }
+        }
+
 
         // =================================================================
         // LÓGICA DE NAVEGACIÓN
@@ -372,15 +522,6 @@
 
         function handleExplore() {
             alertMessage('Mostrando contenido popular y tendencias (Explorar).', 'info');
-        }
-
-        function handleUpload() {
-            if (currentUserId.startsWith('guest_')) {
-                alertMessage('Debes iniciar sesión para subir contenido.', 'error');
-                openModal('auth-modal');
-                return;
-            }
-            alertMessage('Abriendo formulario de subida de video...', 'info');
         }
 
         function handleInbox() {
@@ -392,12 +533,14 @@
             alertMessage('Cargando notificaciones y mensajes (Buzón).', 'info');
         }
 
-        // Exponer funciones al scope global para que los botones onclick las vean
+        // Exponer funciones al scope global
         window.handleExplore = handleExplore;
-        window.handleUpload = handleUpload;
         window.handleInbox = handleInbox;
         window.handleAuthAction = handleAuthAction;
-        window.openComments = openComments; // <<--- FIX APLICADO
+        window.performLogin = performLogin;
+        window.openUploadModal = openUploadModal;
+        window.uploadVideo = uploadVideo; // Nueva función de subida
+        window.openComments = openComments; 
         window.handleShare = handleShare;
 
         // =================================================================
@@ -429,7 +572,6 @@
                     likes: item.likes || 0,
                     comments: item.comments || 0,
                     shares: item.shares || 0,
-                    // Usar el Set de IDs para determinar si el usuario le dio like
                     isLikedByCurrentUser: likedVideoIds.has(item.id), 
                 }));
                 
@@ -438,7 +580,6 @@
                     videoData = mockVideoData;
                 }
 
-                console.log(`Videos cargados: ${videoData.length} (Supabase)`);
                 renderFeed(videoData);
 
             } catch (error) {
@@ -464,18 +605,16 @@
             const video = videoData.find(v => v.id == videoId);
             if (!video) return;
 
-            const isCurrentlyLiked = likedVideoIds.has(videoId); // Estado real basado en Set
+            const isCurrentlyLiked = likedVideoIds.has(videoId); 
             let likeDelta = isCurrentlyLiked ? -1 : 1;
 
             // 1. Optimistic UI Update & Local State Update
-            // Actualiza el Set localmente
             if (!isCurrentlyLiked) {
                 likedVideoIds.add(videoId);
             } else {
                 likedVideoIds.delete(videoId);
             }
 
-            // Actualiza el objeto de datos y el contador
             video.likes += likeDelta;
             video.isLikedByCurrentUser = !isCurrentlyLiked;
             
@@ -489,7 +628,7 @@
             // 2. Transacción de Base de Datos (Supabase)
             if (supabase) {
                 try {
-                    // 2a. Gestionar la tabla video_likes (Insertar/Eliminar el registro del usuario)
+                    // 2a. Gestionar la tabla video_likes
                     if (!isCurrentlyLiked) {
                         const { error: insertError } = await supabase
                             .from('video_likes')
@@ -504,15 +643,13 @@
                         if (deleteError) throw deleteError;
                     }
 
-                    // 2b. Actualizar el contador de likes en la tabla 'videos'
+                    // 2b. Actualizar el contador de likes
                     const { error: updateError } = await supabase
                         .from(SUPABASE_TABLE_NAME)
                         .update({ likes: video.likes })
                         .eq('id', videoId);
                     
                     if (updateError) throw updateError;
-                    
-                    console.log(`Like para video ${videoId} gestionado en Supabase.`);
 
                 } catch (error) {
                     console.error("Error al gestionar like en Supabase:", error.message);
@@ -544,7 +681,7 @@
                  openModal('auth-modal');
                  return;
             }
-            document.execCommand('copy'); // Comando de copia
+            document.execCommand('copy'); 
             alertMessage('¡Enlace del video copiado al portapapeles!', 'info');
         }
 
@@ -557,7 +694,6 @@
                  openModal('auth-modal');
                  return;
             }
-            // NOTA: Podrías cargar los comentarios reales de Supabase aquí antes de abrir el modal
             openModal('comments-modal');
         }
         
@@ -568,7 +704,7 @@
         /**
          * Maneja el tap/clic en el video para Pausar/Reproducir.
          */
-        function tapVideo(videoElement) {
+        const tapVideo = (videoElement) => { 
             if (videoElement.paused) {
                 videoElement.play().catch(e => console.error("Error al intentar reproducir:", e));
                 showTemporaryIcon('pause'); 
@@ -782,6 +918,95 @@
                     }
                 }
             });
+        }
+
+        // =================================================================
+        // LÓGICA DE REPRODUCCIÓN Y UTILIDADES
+        // =================================================================
+
+        /**
+         * Maneja el tap/clic en el video para Pausar/Reproducir.
+         */
+        const tapVideo = (videoElement) => { 
+            if (videoElement.paused) {
+                videoElement.play().catch(e => console.error("Error al intentar reproducir:", e));
+                showTemporaryIcon('pause'); 
+            } else {
+                videoElement.pause();
+                showTemporaryIcon('play'); 
+            }
+
+            function showTemporaryIcon(action) {
+                playPauseIcon.querySelector('svg path').setAttribute('d', action === 'play' ? 'M8 5v14l11-7z' : 'M6 19h4V5H6v14zm8-14v14h4V5h-4z');
+                playPauseIcon.classList.add('show-icon');
+                
+                setTimeout(() => {
+                    playPauseIcon.classList.remove('show-icon');
+                }, 700);
+            }
+        }
+
+
+        /**
+         * Formatea números grandes a formato legible (e.g., 1200 -> 1.2K).
+         */
+        function formatNumber(num) {
+            if (num === null || num === undefined) return '0';
+            if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+            if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+            return num.toString();
+        }
+
+        /**
+         * Muestra un mensaje temporal tipo 'Toast' en la parte inferior.
+         */
+        function alertMessage(message, type = 'success') {
+            const id = 'temp-alert';
+            let alertBox = document.getElementById(id);
+            if (!alertBox) {
+                alertBox = document.createElement('div');
+                alertBox.id = id;
+                document.body.appendChild(alertBox);
+            }
+
+            let bgColor = type === 'error' ? 'bg-red-700' : (type === 'info' ? 'bg-blue-600' : 'bg-green-600');
+
+            alertBox.className = `fixed bottom-20 left-1/2 transform -translate-x-1/2 px-5 py-3 rounded-full shadow-xl text-white font-semibold transition-opacity duration-300 z-50 opacity-100 ${bgColor}`;
+            alertBox.textContent = message;
+
+            setTimeout(() => {
+                alertBox.classList.remove('opacity-100');
+                alertBox.classList.add('opacity-0');
+                setTimeout(() => alertBox.remove(), 300);
+            }, 2500);
+        }
+
+        /**
+         * Abre un modal.
+         */
+        function openModal(id) {
+            const modal = document.getElementById(id);
+            if (modal) {
+                modal.style.display = 'flex';
+                const currentVideo = document.querySelector('.video-container video.active-video');
+                if(currentVideo) currentVideo.pause();
+
+                document.body.classList.add('overflow-hidden');
+            }
+        }
+
+        /**
+         * Cierra un modal.
+         */
+        function closeModal(id) {
+            const modal = document.getElementById(id);
+            if (modal) {
+                modal.style.display = 'none';
+                const currentVideo = document.querySelector('.video-container video.active-video');
+                 if(currentVideo && currentVideo.paused) currentVideo.play().catch(e => console.error("Error al intentar reanudar:", e));
+
+                document.body.classList.remove('overflow-hidden');
+            }
         }
 
         // =================================================================
