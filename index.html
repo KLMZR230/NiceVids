@@ -8,6 +8,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
+        /* --- ESTILOS CSS COMPLETOS --- */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); color: #fff; min-height: 100vh; }
         .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
@@ -190,7 +191,7 @@
             fileLabelText.textContent = fileInput.files[0]?.name || 'Selecciona tu archivo de video (.mp4)';
         });
 
-        // --- 4. LÓGICA DE SUBIDA (NUEVO FLUJO DE 3 PASOS) ---
+        // --- 4. LÓGICA DE SUBIDA (FLUJO DE 3 PASOS CON PRESIGNED URL) ---
         uploadForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -208,71 +209,93 @@
             submitUploadBtn.disabled = true;
 
             try {
-                // --- PASO 1: Obtener la URL firmada de nuestra función ---
+                // --- PASO 1: Obtener la URL firmada de la función 'get-presigned-url' ---
                 submitUploadBtn.innerHTML = '<i class="fas fa-lock"></i> Autorizando...';
                 
                 const { data: urlData, error: urlError } = await supabaseClient.functions.invoke('get-presigned-url', {
+                    // Enviamos el nombre y tipo del archivo para generar la firma correcta
                     body: JSON.stringify({
                         fileName: file.name,
-                        contentType: file.type
+                        contentType: file.type || 'application/octet-stream' // Asegura un content-type
                     })
                 });
 
-                if (urlError) throw urlError;
-                if (!urlData.presignedUrl) throw new Error("No se pudo obtener la URL de subida.");
+                // Manejo de errores al obtener la URL
+                if (urlError) throw urlError; 
+                if (urlData.error) throw new Error(`Error al generar URL: ${urlData.error}`);
+                if (!urlData.presignedUrl || !urlData.publicUrl) throw new Error("Respuesta inválida al generar URL.");
 
                 const { presignedUrl, publicUrl } = urlData;
 
-                // --- PASO 2: Subir el archivo GRANDE directamente a R2 ---
+                // --- PASO 2: Subir el archivo directamente a Cloudflare R2 usando la URL firmada ---
                 submitUploadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Subiendo a R2...';
                 
-                // ¡IMPORTANTE! El header debe coincidir con la firma
+                // Realizamos la petición PUT a la URL que nos dio la función
                 const uploadResponse = await fetch(presignedUrl, {
                     method: 'PUT',
                     headers: {
-                        // El header 'x-amz-meta-content-type' es el que se firmó
-                        'x-amz-meta-content-type': file.type, 
-                        // El 'Content-Type' real también debe estar
-                        'Content-Type': file.type
+                        // El 'Content-Type' debe coincidir con el que se usó para firmar
+                        'Content-Type': file.type || 'application/octet-stream',
                     },
-                    body: file
+                    body: file // El cuerpo de la petición es el archivo en sí
                 });
 
+                // Manejo de errores en la subida a R2
                 if (!uploadResponse.ok) {
-                    const errorText = await uploadResponse.text();
-                    console.error("Error R2:", errorText);
-                    throw new Error('Falló la subida directa a R2.');
+                    const errorText = await uploadResponse.text(); // Leer el error XML de R2 si lo hay
+                    console.error("Error en la subida a R2:", errorText); 
+                    throw new Error(`Falló la subida directa a R2 (${uploadResponse.status}). Revisa la consola.`);
                 }
 
-                // --- PASO 3: Guardar los metadatos en nuestra base de datos ---
-                submitUploadBtn.innerHTML = '<i class="fas fa-database"></i> Guardando...';
+                // --- PASO 3: Guardar los metadatos de la película en la base de datos de Supabase ---
+                submitUploadBtn.innerHTML = '<i class="fas fa-database"></i> Guardando datos...';
 
-                const { data: movieData, error: dbError } = await supabaseClient.functions.invoke('save-movie-details', {
+                // Llamamos a la segunda función 'save-movie-details'
+                const { data: movieSaveData, error: dbError } = await supabaseClient.functions.invoke('save-movie-details', {
                     body: JSON.stringify({
                         title: title,
                         year: year,
                         genre: genre,
                         description: description,
-                        video_url: publicUrl // La URL pública que nos dio la función 1
+                        video_url: publicUrl // Guardamos la URL pública que nos dio la función 1
                     })
                 });
 
-                if (dbError) throw dbError;
+                // Manejo de errores al guardar en la base de datos
+                if (dbError) throw dbError; 
+                if (movieSaveData.error) throw new Error(`Error al guardar datos: ${movieSaveData.error}`);
+                if (!movieSaveData.movie) throw new Error("No se recibieron los datos guardados de la película.");
 
                 // --- ¡ÉXITO! ---
-                alert('¡Película subida con éxito!');
-                uploadModal.style.display = 'none';
-                uploadForm.reset();
-                fileLabelText.textContent = 'Selecciona tu archivo de video (.mp4)';
+                alert('¡Película subida con éxito! 🎉');
+                uploadModal.style.display = 'none'; // Cerrar modal
+                uploadForm.reset(); // Limpiar formulario
+                fileLabelText.textContent = 'Selecciona tu archivo de video (.mp4)'; // Resetear etiqueta
                 
-                // Añadir la nueva película al grid
-                addMovieCardToGrid(movieData.movie);
+                // Añadir la nueva película al grid de la página
+                addMovieCardToGrid(movieSaveData.movie);
 
             } catch (error) {
-                console.error('Error en el proceso de subida:', error);
-                alert(`Error: ${error.message}`);
+                // Captura cualquier error de los 3 pasos
+                console.error('Error en el proceso completo de subida:', error);
+                
+                // Mostrar un mensaje de error más útil
+                let friendlyMessage = "Ocurrió un error inesperado.";
+                if (error instanceof Error) {
+                    if (error.message.includes('non-2xx status code')) {
+                        friendlyMessage = "Error de comunicación con el servidor. Revisa los logs de las funciones en Supabase.";
+                    } else if (error.message.includes('Failed to fetch')) {
+                        friendlyMessage = "Error de red al intentar subir. Revisa tu conexión.";
+                    } else if (error.message.includes('R2')) {
+                         friendlyMessage = `Error al subir a R2: ${error.message}. Revisa la consola para detalles.`;
+                    } else {
+                        friendlyMessage = error.message; // Mensaje genérico del error
+                    }
+                }
+                alert(`Error al subir: ${friendlyMessage}`);
+
             } finally {
-                // Reactivar el botón
+                // Siempre reactivar el botón, incluso si hubo error
                 submitUploadBtn.disabled = false;
                 submitUploadBtn.innerHTML = submitBtnText;
             }
@@ -283,34 +306,40 @@
             const { data: movies, error } = await supabaseClient
                 .from('movies')
                 .select('*')
-                .order('created_at', { ascending: false });
+                .order('created_at', { ascending: false }); // Ordenar por fecha de creación descendente
 
             if (error) {
                 console.error('Error al cargar películas:', error);
-                movieGrid.innerHTML = '<p style="color: #ff6b6b;">Error al cargar las películas.</p>';
+                movieGrid.innerHTML = '<p style="color: #ff6b6b; text-align: center;">Error al cargar las películas. 😥</p>';
                 return;
             }
             if (movies.length === 0) {
-                movieGrid.innerHTML = '<p>No hay películas subidas todavía. ¡Sé el primero!</p>';
+                movieGrid.innerHTML = '<p style="text-align: center;">Aún no hay películas. ¡Sube la primera! 🚀</p>';
                 return;
             }
-            movieGrid.innerHTML = '';
-            movies.forEach(addMovieCardToGrid);
+            movieGrid.innerHTML = ''; // Limpiar grid antes de añadir
+            movies.forEach(addMovieCardToGrid); // Añadir cada película
         }
 
-        // --- 6. FUNCIÓN PARA CREAR Y AÑADIR UNA TARJETA DE PELÍCULA ---
+        // --- 6. FUNCIÓN PARA CREAR Y AÑADIR UNA TARJETA DE PELÍCULA AL HTML ---
         function addMovieCardToGrid(movie) {
+            // Verificación para evitar errores si 'movie' es inválido
+            if (!movie || !movie.id || !movie.title || !movie.video_url) { 
+              console.error("Datos inválidos recibidos para la tarjeta de película:", movie);
+              return; // No añadir la tarjeta si faltan datos esenciales
+            }
+            
             const card = document.createElement('div');
             card.className = 'movie-card';
-            card.setAttribute('data-title', movie.title.toLowerCase());
+            card.setAttribute('data-title', movie.title.toLowerCase()); // Para la búsqueda
 
-            const likes = (movie.likes / 1000).toFixed(1) + 'K';
-            const views = (movie.views / 1000).toFixed(1) + 'K';
+            // Usar valores por defecto si 'likes' o 'views' no existen
+            const likes = ((movie.likes || 0) / 1000).toFixed(1) + 'K'; 
+            const views = ((movie.views || 0) / 1000).toFixed(1) + 'K'; 
 
             card.innerHTML = `
                 <div class="movie-player" data-video="${movie.video_url}">
-                    <video controls>
-                        <source src="${movie.video_url}" type="video/mp4">
+                    <video controls preload="metadata"> <source src="${movie.video_url}" type="video/mp4">
                         Tu navegador no soporta la reproducción de video.
                     </video>
                     <button class="play-button">
@@ -320,9 +349,8 @@
                 <div class="movie-info">
                     <h3 class="movie-title">${movie.title}</h3>
                     <div class="movie-meta">
-                        <span>${movie.year} • ${movie.genre}</span>
-                        <span>⭐ --</span>
-                    </div>
+                        <span>${movie.year || 'Año desc.'} • ${movie.genre || 'Género desc.'}</span>
+                        <span>⭐ --</span> </div>
                     <div class="movie-actions">
                         <button class="like-btn" data-movie-id="${movie.id}">
                             <i class="far fa-heart"></i>
@@ -335,8 +363,10 @@
                 </div>
             `;
             
-            movieGrid.prepend(card);
-            addCardListeners(card);
+            // Añadir la tarjeta al inicio del grid para que aparezca primero
+            movieGrid.prepend(card); 
+            // Añadir listeners para play/like a la nueva tarjeta
+            addCardListeners(card); 
         }
 
         // --- 7. FUNCIONALIDAD DE REPRODUCCIÓN Y LIKES (PARA CADA TARJETA) ---
@@ -344,45 +374,52 @@
             const playButton = card.querySelector('.play-button');
             const video = card.querySelector('video');
 
+            // Al hacer clic en el botón de play
             playButton.addEventListener('click', function() {
-                video.style.display = 'block';
-                playButton.style.display = 'none';
-                video.play();
+                video.style.display = 'block'; // Mostrar el reproductor
+                playButton.style.display = 'none'; // Ocultar el botón de play
+                video.play(); // Iniciar reproducción
             });
 
+            // Lógica simulada para el botón de like
             const likeButton = card.querySelector('.like-btn');
             likeButton.addEventListener('click', function() {
-                // (Lógica de like simulada)
                 const icon = this.querySelector('i');
                 const countEl = this.querySelector('span');
-                let currentCount = parseFloat(countEl.textContent);
-                if (icon.classList.contains('fas')) {
+                let currentCount = parseFloat(countEl.textContent) || 0; // Usar 0 si no es número
+                
+                if (icon.classList.contains('fas')) { // Si ya tiene like
                     icon.classList.remove('fas');
-                    icon.classList.add('far');
-                    countEl.textContent = (currentCount - 0.1).toFixed(1) + 'K';
-                } else {
+                    icon.classList.add('far'); // Cambiar a corazón vacío
+                    countEl.textContent = Math.max(0, currentCount - 0.1).toFixed(1) + 'K'; // Decrementar (sin negativos)
+                    this.style.background = 'rgba(255, 107, 107, 0.2)'; // Estilo 'no like'
+                } else { // Si no tiene like
                     icon.classList.remove('far');
-                    icon.classList.add('fas');
-                    countEl.textContent = (currentCount + 0.1).toFixed(1) + 'K';
+                    icon.classList.add('fas'); // Cambiar a corazón lleno
+                    countEl.textContent = (currentCount + 0.1).toFixed(1) + 'K'; // Incrementar
+                    this.style.background = 'rgba(255, 107, 107, 0.4)'; // Estilo 'like'
                 }
+                // Aquí podrías añadir una llamada a Supabase para actualizar el contador real en la DB
             });
         }
 
         // --- 8. FUNCIONALIDAD DE BÚSQUEDA ---
         searchInput.addEventListener('input', function(e) {
-            const searchTerm = e.target.value.toLowerCase();
+            const searchTerm = e.target.value.toLowerCase().trim(); // Convertir a minúsculas y quitar espacios
             const allCards = movieGrid.querySelectorAll('.movie-card');
+            
             allCards.forEach(card => {
-                const title = card.getAttribute('data-title');
-                card.style.display = title.includes(searchTerm) ? 'flex' : 'none';
+                const title = card.getAttribute('data-title') || ''; // Obtener título (asegura que exista)
+                // Mostrar tarjeta si el título incluye el término de búsqueda, ocultar si no
+                card.style.display = title.includes(searchTerm) ? 'flex' : 'none'; 
             });
         });
 
-        // --- 9. CARGA INICIAL DE PELÍCULAS ---
+        // --- 9. CARGA INICIAL DE PELÍCULAS AL CARGAR LA PÁGINA ---
         document.addEventListener('DOMContentLoaded', () => {
-            loadMovies();
+            loadMovies(); // Llama a la función para cargar las películas
         });
 
     </script>
-</body>
+    </body>
 </html>
