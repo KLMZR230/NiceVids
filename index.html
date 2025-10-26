@@ -6,6 +6,7 @@
     <title>KLMZ PELIS - Con Admin Integrado</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <style>
         /* --- ESTILOS CSS COMPLETOS (Añadimos estilos para admin) --- */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
@@ -26,7 +27,7 @@
         .upload-btn:hover, .profile-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(255, 107, 107, 0.4); }
         .profile-btn:hover { box-shadow: 0 10px 25px rgba(78, 205, 196, 0.4); }
 
-        /* Estilos del contenido principal y tarjetas (sin cambios mayores) */
+        /* Estilos del contenido principal y tarjetas */
         .main-content { display: grid; grid-template-columns: 1fr; gap: 30px; margin-bottom: 40px; }
         .movie-section { background: rgba(255, 255, 255, 0.08); border-radius: 20px; padding: 30px; backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
         .section-title { font-size: 2rem; margin-bottom: 25px; color: #4ecdc4; display: flex; align-items: center; gap: 10px; }
@@ -34,9 +35,9 @@
         .movie-card { background: rgba(0, 0, 0, 0.4); border-radius: 15px; overflow: hidden; transition: all 0.3s ease; border: 1px solid rgba(255, 255, 255, 0.1); display: flex; flex-direction: column; position: relative; /* Para botones admin */ }
         .movie-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3); border-color: rgba(255, 107, 107, 0.3); }
         .movie-player { width: 100%; aspect-ratio: 16 / 9; background: #000; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.2rem; font-weight: 600; text-align: center; position: relative; overflow: hidden; }
-        .movie-cover { /* NUEVO: Estilo para la portada */ width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; z-index: 1; transition: opacity 0.3s ease; }
-        .movie-player video { width: 100%; height: 100%; object-fit: cover; display: none; background-color: #000; z-index: 0; /* Detrás de la portada */ position: relative; }
-        .play-button { background: rgba(255, 107, 107, 0.8); border: none; color: white; width: 60px; height: 60px; border-radius: 50%; font-size: 1.5rem; cursor: pointer; transition: all 0.3s ease; z-index: 2; position: absolute; } /* Encima de portada/video */
+        .movie-cover { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; z-index: 1; transition: opacity 0.3s ease; }
+        .movie-player video { width: 100%; height: 100%; object-fit: cover; display: none; background-color: #000; z-index: 0; position: relative; }
+        .play-button { background: rgba(255, 107, 107, 0.8); border: none; color: white; width: 60px; height: 60px; border-radius: 50%; font-size: 1.5rem; cursor: pointer; transition: all 0.3s ease; z-index: 2; position: absolute; }
         .play-button:hover { background: rgba(255, 107, 107, 1); transform: scale(1.1); }
         .movie-info { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; }
         .movie-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 10px; color: #fff; flex-grow: 1; word-break: break-word; overflow-wrap: break-word; }
@@ -48,22 +49,43 @@
         .stat { display: flex; align-items: center; gap: 5px; color: #aaa; font-size: 0.9rem; }
         .stat i { color: #ff6b6b; }
 
-        /* --- NUEVO: Estilos Admin --- */
-        .admin-actions { position: absolute; top: 10px; right: 10px; z-index: 3; display: none; /* Oculto por defecto */ gap: 5px; background: rgba(0,0,0,0.6); padding: 5px; border-radius: 5px; }
-        .admin-actions button { padding: 5px 8px; font-size: 0.8rem; }
-        .btn-edit-admin { background-color: #ffc107; color: #333; }
-        .btn-delete-admin { background-color: #dc3545; color: white; }
-        body.admin-mode .admin-actions { display: flex; } /* Mostrar si body tiene clase admin-mode */
+        /* --- ESTILOS ADMIN --- */
+        .admin-actions {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 3; /* Encima de la portada y el botón play */
+            display: none; /* Oculto por defecto */
+            gap: 8px; /* Espacio entre botones */
+            background: rgba(0,0,0,0.7);
+            padding: 8px;
+            border-radius: 5px;
+        }
+        .admin-actions button {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 1rem; /* Tamaño del icono */
+            padding: 5px;
+            line-height: 1;
+            transition: color 0.2s ease;
+        }
+        .admin-actions button:hover { color: #ffc107; /* Amarillo al pasar por encima */ }
+        .btn-delete-admin:hover { color: #dc3545; /* Rojo al pasar por encima */ }
+        /* Mostrar botones si el body tiene la clase 'admin-mode' */
+        body.admin-mode .admin-actions { display: flex; }
 
         /* Estilos Modales (Upload, Auth, Edit - Reutilizados) */
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.8); backdrop-filter: blur(5px); padding: 20px; }
         .modal-content { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); margin: 5% auto; padding: 30px; width: 95%; max-width: 600px; border-radius: 20px; border: 1px solid rgba(255, 107, 107, 0.3); position: relative;}
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-right: 40px; /* Espacio para botón cerrar */ }
         .modal-title { font-size: 1.8rem; color: #ff6b6b; }
         .close-modal { background: none; border: none; color: white; font-size: 1.8rem; cursor: pointer; padding: 5px; line-height: 1; position: absolute; top: 15px; right: 20px; }
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #4ecdc4; }
         .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 12px; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 10px; color: white; font-size: 1rem; box-sizing: border-box;}
+        .form-group input:-webkit-autofill { /* Arreglo para autofill oscuro */ -webkit-box-shadow: 0 0 0 30px #16213e inset !important; -webkit-text-fill-color: white !important; }
         .form-group textarea { resize: vertical; min-height: 100px; }
         .form-group img { max-width: 150px; max-height: 150px; display: block; margin-top: 10px; border-radius: 5px; border: 1px solid #444;}
         .file-input-container { position: relative; border: 2px dashed rgba(255, 107, 107, 0.3); border-radius: 10px; padding: 30px; text-align: center; cursor: pointer; transition: all 0.3s ease; }
@@ -72,26 +94,26 @@
         .file-label { display: flex; flex-direction: column; align-items: center; gap: 10px; pointer-events: none; }
         .file-label i { font-size: 2.5rem; color: #ff6b6b; }
         .file-label span { word-break: break-all; }
-        .submit-btn, .action-btn { background: linear-gradient(45deg, #ff6b6b, #ff8e8e); color: white; border: none; padding: 15px; border-radius: 10px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .action-btn { background: linear-gradient(45deg, #4ecdc4, #6aede1); font-size: 1rem; padding: 12px 20px; } /* Botones secundarios */
+        .submit-btn, .action-btn { background: linear-gradient(45deg, #ff6b6b, #ff8e8e); color: white; border: none; padding: 15px; border-radius: 10px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; /* Ocupar ancho completo en modales */ }
+        .action-btn { background: linear-gradient(45deg, #4ecdc4, #6aede1); font-size: 1rem; padding: 12px 20px; }
         .submit-btn:disabled, .action-btn:disabled { background: #aaa; cursor: not-allowed; opacity: 0.7; transform: none; box-shadow: none; }
         .submit-btn:hover:not(:disabled), .action-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(255, 107, 107, 0.4); }
         .action-btn:hover:not(:disabled) { box-shadow: 0 10px 25px rgba(78, 205, 196, 0.4); }
-        .error-message { color: #ff6b6b; margin-top: 10px; font-size: 0.9rem; }
+        .error-message { color: #ff6b6b; margin-top: 15px; font-size: 0.9rem; text-align: center; }
         .loader { border: 4px solid rgba(255,255,255,0.3); border-top: 4px solid #fff; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; margin-left: 10px; vertical-align: middle; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* Footer y Scrollbar (sin cambios) */
+        /* Footer y Scrollbar */
         footer { text-align: center; padding: 30px 20px; color: #aaa; border-top: 1px solid rgba(255, 255, 255, 0.1); margin-top: 20px; }
         .developer-info { margin-top: 10px; font-style: italic; color: #4ecdc4; }
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.2); border-radius: 4px; }
         ::-webkit-scrollbar-thumb { background: linear-gradient(45deg, #ff6b6b, #4ecdc4); border-radius: 4px; }
-        /* Responsive (sin cambios mayores) */
+        /* Responsive */
         @media (max-width: 768px) {
             .header-content { flex-direction: column; gap: 15px; }
             .search-bar { max-width: 90%; width: 100%; order: 2; }
-            .header-actions { width: 90%; justify-content: space-between; order: 3; } /* Ajuste para botones */
+            .header-actions { width: 90%; justify-content: space-around; /* Mejor espacio */ order: 3; }
             .logo { order: 1; }
             .movie-grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
             .movie-player { aspect-ratio: 16 / 9; }
@@ -102,13 +124,13 @@
             .section-title { font-size: 1.6rem; }
             .modal-content { margin: 10% auto; padding: 20px;}
             .modal-title { font-size: 1.5rem; }
-            .header-actions { flex-direction: column; gap: 10px; } /* Apilar botones en móvil */
+            .header-actions { flex-direction: column; gap: 10px; align-items: center; }
+            .upload-btn, .profile-btn { width: 80%; justify-content: center;}
         }
 
     </style>
 </head>
-<body>
-    <div class="container">
+<body > <div class="container">
         <header>
             <div class="header-content">
                 <div class="logo">
@@ -122,7 +144,8 @@
                 <div class="header-actions">
                     <button class="upload-btn" id="openUploadModal">
                         <i class="fas fa-upload"></i>
-                        <span>Subir Película</span> </button>
+                        <span>Subir Película</span>
+                    </button>
                     <button class="profile-btn" id="openAuthModal">
                         <i class="fas fa-user-circle"></i>
                         <span id="authBtnText">Login</span>
@@ -134,7 +157,8 @@
         <div class="main-content">
             <div class="movie-section">
                 <h2 class="section-title">
-                    <i class="fas fa-video"></i> Películas Recientes
+                    <i class="fas fa-video"></i>
+                    Películas Recientes
                 </h2>
                 <div class="movie-grid" id="movieGrid">
                     <p style="text-align: center; grid-column: 1 / -1;">Cargando películas...</p>
@@ -155,7 +179,7 @@
                 <h2 class="modal-title">Subir Película a R2</h2>
             </div>
             <form class="upload-form" id="uploadForm">
-                <div class="form-group">
+                 <div class="form-group">
                     <label for="movieTitle">Título</label>
                     <input type="text" id="movieTitle" required>
                 </div>
@@ -177,9 +201,9 @@
                 <div class="form-group">
                     <label for="coverFile">Portada (Opcional, JPG/PNG)</label>
                     <input type="file" id="coverFile" accept="image/jpeg, image/png">
-                     <img id="coverPreview" src="" alt="Vista previa portada" style="display: none; max-width: 100px; margin-top: 5px;">
+                     <img id="coverPreview" src="" alt="Vista previa portada" style="display: none;">
                 </div>
-                 <div class="form-group">
+                <div class="form-group">
                     <label>Archivo de Video (MP4)</label>
                     <div class="file-input-container">
                         <input type="file" id="videoFile" class="file-input" accept="video/mp4" required>
@@ -215,7 +239,9 @@
              </div>
             <form id="editForm">
                 <input type="hidden" id="editMovieId">
-                <input type="hidden" id="editVideoUrl"> <input type="hidden" id="editCoverUrl"> <div class="form-group">
+                <input type="hidden" id="editVideoUrl">
+                <input type="hidden" id="editCoverUrl">
+                <div class="form-group">
                     <label for="editTitle">Título</label>
                     <input type="text" id="editTitle" required>
                 </div>
@@ -253,7 +279,7 @@
         // --- 1. CONFIGURACIÓN ---
         const SUPABASE_URL = 'https://fcpczyohzcgulbfpthuc.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZjcGN6eW9oemNndWxiZnB0aHVjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE0MDA4NzksImV4cCI6MjA3Njk3Njg3OX0.Ya3sJ2Hb0gr8pCg5CEheMDWGjSCAuPeoNcfANUTuwPk';
-        const ADMIN_EMAIL = 'tu_correo_admin@example.com'; // <--- ¡¡¡CAMBIA ESTO POR TU CORREO!!!
+        const ADMIN_EMAIL = 'klmzr230@gmail.com'; // <--- ¡¡¡TU CORREO ADMIN AQUÍ!!!
 
         const { createClient } = supabase;
         const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -267,21 +293,23 @@
         const movieGrid = document.getElementById('movieGrid');
         const uploadForm = document.getElementById('uploadForm');
         const editForm = document.getElementById('editForm');
-        const fileInput = document.getElementById('videoFile');
-        const coverInput = document.getElementById('coverFile'); // Input de portada en modal de subida
+        const videoFileInput = document.getElementById('videoFile'); // Renombrado para claridad
+        const coverFileInput = document.getElementById('coverFile'); // Portada en modal subida
+        const editCoverFileInput = document.getElementById('editCoverFile'); // Portada en modal edición
         const fileLabelText = document.getElementById('fileLabelText');
         const submitUploadBtn = document.getElementById('submitUploadBtn');
         const uploadLoader = document.getElementById('uploadLoader');
         const uploadError = document.getElementById('uploadError');
-        const coverPreview = document.getElementById('coverPreview'); // Preview en modal de subida
-        const editCoverPreview = document.getElementById('editCoverPreview'); // Preview en modal edit
+        const coverPreview = document.getElementById('coverPreview');
+        const editCoverPreview = document.getElementById('editCoverPreview');
         const saveChangesBtn = document.getElementById('saveChangesBtn');
         const editLoader = document.getElementById('editLoader');
         const editError = document.getElementById('editError');
         const searchInput = document.getElementById('searchInput');
+        const modalAuthError = document.getElementById('modalAuthError'); // Error en modal auth
 
-        let currentUser = null; // Guardará la sesión del usuario
-        let isAdmin = false; // Flag para saber si es admin
+        let currentUser = null;
+        let isAdmin = false;
 
         // --- 3. FUNCIONES UTILITARIAS ---
         function openModal(modalId) { document.getElementById(modalId).style.display = 'block'; }
@@ -293,41 +321,39 @@
 
         // --- 4. LÓGICA DE AUTENTICACIÓN ---
         async function checkSession() {
-            const { data: { session } } = await supabaseClient.auth.getSession();
-            currentUser = session?.user ?? null;
-            isAdmin = currentUser?.email === ADMIN_EMAIL;
-            updateUIBasedOnAuth();
-            if (isAdmin) {
-                renderAdminUI(); // Asegura que la UI admin esté lista
+            try {
+                const { data: { session }, error } = await supabaseClient.auth.getSession();
+                if (error) throw error;
+                currentUser = session?.user ?? null;
+                isAdmin = currentUser?.email === ADMIN_EMAIL;
+            } catch (error) {
+                console.error("Error checking session:", error);
+                currentUser = null;
+                isAdmin = false;
+            } finally {
+                updateUIBasedOnAuth();
+                loadMovies(); // Siempre cargar películas
             }
-            loadMovies(); // Cargar películas después de verificar sesión
         }
 
         function updateUIBasedOnAuth() {
-            if (currentUser) {
-                authBtnText.textContent = 'Perfil'; // O 'Logout'
-                // Opcional: Mostrar email del usuario en algún lugar
-            } else {
-                authBtnText.textContent = 'Login';
-            }
-            // Añadir/quitar clase al body para mostrar/ocultar botones admin en tarjetas
+            authBtnText.textContent = currentUser ? 'Perfil' : 'Login';
             document.body.classList.toggle('admin-mode', isAdmin);
+            // Habilitar/deshabilitar botón de subir si no es admin (opcional)
+            // document.getElementById('openUploadModal').style.display = isAdmin ? 'flex' : 'none';
         }
 
-        // Renderiza el contenido del modal de autenticación
         function renderAuthUI() {
-            hideError(document.getElementById('modalAuthError')); // Ocultar errores previos
+            hideError(modalAuthError);
             if (currentUser) {
-                // Vista de Logout
                 authContainer.innerHTML = `
                     <div class="modal-header"><h2 class="modal-title">Perfil</h2></div>
                     <p>Conectado como: <strong>${currentUser.email}</strong></p>
-                    ${isAdmin ? '<p style="color: #4ecdc4; font-weight: bold;">(Admin)</p>' : ''}
-                    <button id="modalLogoutBtn" class="action-btn" style="margin-top: 20px;">Cerrar Sesión</button>
+                    ${isAdmin ? '<p style="color: #4ecdc4; font-weight: bold; margin-top: 5px;">Tienes permisos de Administrador.</p>' : ''}
+                    <button id="modalLogoutBtn" class="action-btn" style="margin-top: 20px; width: auto;">Cerrar Sesión</button>
                 `;
                 document.getElementById('modalLogoutBtn').addEventListener('click', handleLogout);
             } else {
-                // Vista de Login
                 authContainer.innerHTML = `
                     <div class="modal-header"><h2 class="modal-title">Iniciar Sesión</h2></div>
                     <form id="loginForm">
@@ -340,8 +366,7 @@
                             <input type="password" id="modalPassword" required>
                         </div>
                         <button type="submit" class="submit-btn" id="modalLoginBtn">
-                            Login
-                            <span id="authLoader" class="loader" style="display: none;"></span>
+                            Login <span id="authLoader" class="loader" style="display: none;"></span>
                         </button>
                     </form>
                 `;
@@ -349,120 +374,116 @@
             }
         }
 
-         // Abrir modal de autenticación
         document.getElementById('openAuthModal').addEventListener('click', () => {
-            renderAuthUI(); // Actualizar contenido antes de mostrar
+            renderAuthUI();
             openModal('authModal');
         });
 
-        // Manejar submit del login
         async function handleLogin(e) {
             e.preventDefault();
             const email = document.getElementById('modalEmail').value;
             const password = document.getElementById('modalPassword').value;
             const loginBtn = document.getElementById('modalLoginBtn');
             const loader = document.getElementById('authLoader');
-            const errorEl = document.getElementById('modalAuthError');
 
-            hideError(errorEl);
+            hideError(modalAuthError);
             showLoader(loader);
             loginBtn.disabled = true;
 
-            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-
-            hideLoader(loader);
-            loginBtn.disabled = false;
-
-            if (error) {
-                showError(errorEl, `Error: ${error.message}`);
+            try {
+                const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+                if (error) throw error;
+                if (data?.user) {
+                    currentUser = data.user;
+                    isAdmin = currentUser.email === ADMIN_EMAIL;
+                    updateUIBasedOnAuth();
+                    closeModal('authModal');
+                    loadMovies(); // Recargar para mostrar botones admin
+                    alert(`¡Bienvenido ${isAdmin ? 'Admin' : ''}!`);
+                } else {
+                     throw new Error("No se recibieron datos de usuario.");
+                }
+            } catch (error) {
+                showError(modalAuthError, `Error: ${error.message}`);
                 console.error("Login error:", error);
-            } else if (data?.user) {
-                currentUser = data.user;
-                isAdmin = currentUser.email === ADMIN_EMAIL;
-                updateUIBasedOnAuth();
-                closeModal('authModal');
-                loadMovies(); // Recargar películas para mostrar/ocultar botones admin
-                if (isAdmin) renderAdminUI(); // Prepara UI admin si es necesario
-                alert(`¡Bienvenido ${isAdmin ? 'Admin' : ''}!`);
+            } finally {
+                 hideLoader(loader);
+                 if(loginBtn) loginBtn.disabled = false; // Asegura que exista
             }
         }
 
-        // Manejar logout
         async function handleLogout() {
-            const { error } = await supabaseClient.auth.signOut();
-            if (error) {
-                alert(`Error al cerrar sesión: ${error.message}`);
-            } else {
-                currentUser = null;
-                isAdmin = false;
-                updateUIBasedOnAuth();
-                closeModal('authModal');
-                loadMovies(); // Recargar películas para quitar botones admin
-                alert('Sesión cerrada.');
-            }
+             const { error } = await supabaseClient.auth.signOut();
+             if (error) {
+                 alert(`Error al cerrar sesión: ${error.message}`);
+             } else {
+                 currentUser = null;
+                 isAdmin = false;
+                 updateUIBasedOnAuth();
+                 closeModal('authModal');
+                 loadMovies(); // Recargar para ocultar botones admin
+                 alert('Sesión cerrada.');
+             }
         }
 
         // --- 5. LÓGICA DE SUBIDA (SIMPLIFICADA CON PORTADA) ---
         uploadForm.addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            const videoFile = fileInput.files[0];
-            const coverFile = coverInput.files[0]; // Archivo de portada
+            const videoFile = videoFileInput.files[0];
+            const coverFile = coverFileInput.files[0];
             const title = document.getElementById('movieTitle').value;
             const year = document.getElementById('movieYear').value;
             const genre = document.getElementById('movieGenre').value;
             const description = document.getElementById('movieDescription').value;
 
             if (!videoFile) {
-                showError(uploadError, 'Selecciona un archivo de video.');
-                return;
+                showError(uploadError, 'Selecciona un archivo de video.'); return;
             }
             hideError(uploadError);
             submitUploadBtn.disabled = true;
             showLoader(uploadLoader);
 
-            let coverPublicUrl = null; // URL de la portada (si se sube)
-            let videoPublicUrl = null; // URL del video
+            let coverPublicUrl = null;
+            let videoPublicUrl = null;
 
             try {
-                 // --- PASO 1a: Subir Portada (si existe) ---
+                // Subir Portada si existe
                 if (coverFile) {
-                    submitUploadBtn.innerHTML = '<i class="fas fa-image"></i> Subiendo Portada...';
+                    submitUploadBtn.firstElementChild.className = 'fas fa-image'; // Cambiar icono
+                    submitUploadBtn.lastChild.textContent = ' Subiendo Portada...';
                     const { presignedUrl, publicUrl } = await getUploadUrl('get-image-presigned-url', coverFile);
                     await uploadFileDirectly(presignedUrl, coverFile);
-                    coverPublicUrl = publicUrl; // Guardar URL de portada
+                    coverPublicUrl = publicUrl;
                 }
 
-                // --- PASO 1b: Obtener URL firmada para el VIDEO ---
-                submitUploadBtn.innerHTML = '<i class="fas fa-lock"></i> Autorizando Video...';
+                // Obtener URL para Video
+                submitUploadBtn.firstElementChild.className = 'fas fa-lock';
+                submitUploadBtn.lastChild.textContent = ' Autorizando Video...';
                 const { presignedUrl: videoPresignedUrl, publicUrl: vidPublicUrl } = await getUploadUrl('get-presigned-url', videoFile);
-                videoPublicUrl = vidPublicUrl; // Guardar URL de video
+                videoPublicUrl = vidPublicUrl;
 
-                // --- PASO 2: Subir el VIDEO directamente a R2 ---
-                submitUploadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Subiendo Video...';
+                // Subir Video
+                submitUploadBtn.firstElementChild.className = 'fas fa-spinner fa-spin';
+                submitUploadBtn.lastChild.textContent = ' Subiendo Video...';
                 await uploadFileDirectly(videoPresignedUrl, videoFile);
 
-                // --- PASO 3: Guardar TODO en Supabase DB ---
-                submitUploadBtn.innerHTML = '<i class="fas fa-database"></i> Guardando datos...';
+                // Guardar en DB
+                submitUploadBtn.firstElementChild.className = 'fas fa-database';
+                submitUploadBtn.lastChild.textContent = ' Guardando datos...';
                 const { data: movieData, error: dbError } = await supabaseClient
                     .from('movies')
-                    .insert({
-                        title, year: parseInt(year), genre, description,
-                        video_url: videoPublicUrl, // URL del video
-                        cover_url: coverPublicUrl // URL de la portada (o null)
-                    })
-                    .select()
-                    .single();
+                    .insert({ title, year: parseInt(year), genre, description, video_url: videoPublicUrl, cover_url: coverPublicUrl })
+                    .select().single();
 
                 if (dbError) throw dbError;
                 if (!movieData) throw new Error("No se recibieron datos al guardar.");
 
-                // --- ÉXITO ---
-                alert('¡Película subida con éxito! 🎉');
+                alert('¡Película subida! 🎉');
                 closeModal('uploadModal');
                 uploadForm.reset();
                 fileLabelText.textContent = 'Selecciona tu archivo de video (.mp4)';
-                coverPreview.style.display = 'none'; // Ocultar preview
+                coverPreview.style.display = 'none';
                 addMovieCardToGrid(movieData);
 
             } catch (error) {
@@ -471,12 +492,11 @@
             } finally {
                 submitUploadBtn.disabled = false;
                 hideLoader(uploadLoader);
-                // Restaurar texto original del botón
-                submitUploadBtn.innerHTML = '<i class="fas fa-upload"></i> Subir Película';
+                submitUploadBtn.innerHTML = submitBtnText; // Restaurar botón
             }
         });
 
-        // Función auxiliar para obtener URL firmada (reutilizable)
+        // Función auxiliar para obtener URL firmada
         async function getUploadUrl(functionName, file) {
             const { data, error } = await supabaseClient.functions.invoke(functionName, {
                 body: JSON.stringify({
@@ -507,7 +527,7 @@
         }
 
          // Preview de portada en modal de subida
-        coverInput.addEventListener('change', (e) => {
+        coverFileInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (file) {
                 const reader = new FileReader();
@@ -518,32 +538,32 @@
                 reader.readAsDataURL(file);
             } else {
                 coverPreview.style.display = 'none';
+                coverPreview.src = ''; // Limpiar src
             }
         });
 
-
         // --- 6. CARGAR PELÍCULAS Y RENDERIZAR TARJETAS ---
         async function loadMovies() {
-            // Mostrar mensaje de carga inicial
-             movieGrid.innerHTML = '<p style="text-align: center; grid-column: 1 / -1;">Cargando películas...</p>';
+            movieGrid.innerHTML = '<p style="text-align: center; grid-column: 1 / -1;">Cargando películas...</p>';
+            try {
+                const { data: movies, error } = await supabaseClient
+                    .from('movies')
+                    .select('*')
+                    .order('created_at', { ascending: false });
 
-            const { data: movies, error } = await supabaseClient
-                .from('movies')
-                .select('*')
-                .order('created_at', { ascending: false });
+                movieGrid.innerHTML = ''; // Limpiar siempre
 
-            movieGrid.innerHTML = ''; // Limpiar antes de mostrar resultados
+                if (error) throw error;
 
-            if (error) {
-                console.error('Error al cargar películas:', error);
-                movieGrid.innerHTML = '<p style="color: #ff6b6b; text-align: center; grid-column: 1 / -1;">Error al cargar. 😥</p>';
-                return;
+                if (movies.length === 0) {
+                    movieGrid.innerHTML = '<p style="text-align: center; grid-column: 1 / -1;">Aún no hay películas. ¡Sube la primera! 🚀</p>';
+                } else {
+                    movies.forEach(addMovieCardToGrid);
+                }
+            } catch (error) {
+                 console.error('Error al cargar películas:', error);
+                 movieGrid.innerHTML = `<p style="color: #ff6b6b; text-align: center; grid-column: 1 / -1;">Error al cargar: ${error.message} 😥</p>`;
             }
-            if (movies.length === 0) {
-                movieGrid.innerHTML = '<p style="text-align: center; grid-column: 1 / -1;">Aún no hay películas. ¡Sube la primera! 🚀</p>';
-                return;
-            }
-            movies.forEach(addMovieCardToGrid);
         }
 
         function addMovieCardToGrid(movie) {
@@ -552,28 +572,23 @@
             }
             const card = document.createElement('div');
             card.className = 'movie-card';
-            card.setAttribute('data-movie-id', movie.id); // Guardar ID para referencia
+            card.setAttribute('data-movie-id', movie.id);
             card.setAttribute('data-title', movie.title.toLowerCase());
 
             const likes = ((movie.likes || 0) / 1000).toFixed(1) + 'K';
             const views = ((movie.views || 0) / 1000).toFixed(1) + 'K';
-
-            // Usar portada si existe, si no, un placeholder o nada
-            const coverImage = movie.cover_url
-                ? `<img src="${movie.cover_url}" alt="Portada de ${movie.title}" class="movie-cover">`
-                : ''; // Si no hay portada, no poner img
+            const coverImage = movie.cover_url ? `<img src="${movie.cover_url}" alt="Portada" class="movie-cover">` : '';
 
             card.innerHTML = `
                 <div class="movie-player">
                     ${coverImage}
                     <video controls preload="metadata">
-                        <source src="${movie.video_url}" type="video/mp4">
-                        Tu navegador no soporta video.
+                        <source src="${movie.video_url}" type="video/mp4">Tu navegador no soporta video.
                     </video>
                     <button class="play-button"><i class="fas fa-play"></i></button>
                     <div class="admin-actions">
                         <button class="btn-edit-admin" title="Editar"><i class="fas fa-pencil-alt"></i></button>
-                        <button class="btn-delete-admin" title="Eliminar"><i class="fas fa-trash-alt"></i></button>
+                        <button class="btn-delete-admin" title="Eliminar (solo DB)"><i class="fas fa-trash-alt"></i></button>
                     </div>
                 </div>
                 <div class="movie-info">
@@ -592,47 +607,33 @@
                     </div>
                 </div>
             `;
-
-            // Añadir listeners generales
-            addCardListeners(card, movie);
-
-            movieGrid.appendChild(card); // Usar appendChild para mantener orden si se recarga
+            addCardListeners(card, movie); // Añadir listeners ANTES de añadir al DOM
+            movieGrid.appendChild(card); // Usar appendChild para mantener el orden de carga
         }
 
         // --- 7. LISTENERS DE TARJETAS (PLAY, LIKE, ADMIN) ---
         function addCardListeners(card, movie) {
             const playButton = card.querySelector('.play-button');
             const video = card.querySelector('video');
-            const cover = card.querySelector('.movie-cover'); // Portada
+            const cover = card.querySelector('.movie-cover');
 
-            // Play: Oculta portada (si existe) y botón, muestra video
-            playButton.addEventListener('click', () => {
-                if (cover) cover.style.opacity = '0'; // Ocultar portada
-                playButton.style.display = 'none';
-                video.style.display = 'block';
-                video.play();
+            playButton?.addEventListener('click', () => { // Usar ? por si acaso
+                if (cover) cover.style.opacity = '0';
+                if (playButton) playButton.style.display = 'none';
+                if (video) {
+                    video.style.display = 'block';
+                    video.play();
+                }
             });
-            // Opcional: Pausar y mostrar portada/botón de nuevo
-            video.addEventListener('pause', () => {
-                 if (cover && video.currentTime === 0) { // Solo mostrar si está al inicio
-                     // cover.style.opacity = '1';
-                     // playButton.style.display = 'block';
-                     // video.style.display = 'none';
-                 }
+            video?.addEventListener('pause', () => { /* ... lógica opcional ... */ });
+            video?.addEventListener('ended', () => {
+                 if (cover) cover.style.opacity = '1';
+                 if (playButton) playButton.style.display = 'block';
+                 if (video) { video.style.display = 'none'; video.currentTime = 0; }
             });
-             video.addEventListener('ended', () => {
-                 if (cover) {
-                     cover.style.opacity = '1';
-                     playButton.style.display = 'block';
-                     video.style.display = 'none';
-                     video.currentTime = 0; // Resetear
-                 }
-             });
 
-
-            // Like (simulado)
             const likeButton = card.querySelector('.like-btn');
-            likeButton.addEventListener('click', function() { /* ... (misma lógica que antes) ... */
+            likeButton?.addEventListener('click', function() { /* ... lógica like ... */
                 const icon = this.querySelector('i');
                 const countEl = this.querySelector('span');
                 let currentCount = parseFloat(countEl.textContent) || 0;
@@ -645,27 +646,16 @@
                 }
             });
 
-            // Listeners Admin (Editar/Borrar)
-            const editBtn = card.querySelector('.btn-edit-admin');
-            const deleteBtn = card.querySelector('.btn-delete-admin');
-
-            if (editBtn) {
-                editBtn.addEventListener('click', (e) => {
-                    e.stopPropagation(); // Evitar que se active el play
-                    openEditModal(movie); // Pasar datos de la película al modal
-                });
-            }
-            if (deleteBtn) {
-                 deleteBtn.addEventListener('click', (e) => {
-                    e.stopPropagation(); // Evitar que se active el play
-                    deleteMovie(movie.id, movie.video_url, movie.cover_url); // Pasar IDs/URLs para borrar
-                });
-            }
+            // Listeners Admin (solo se adjuntan si los botones existen)
+            card.querySelector('.btn-edit-admin')?.addEventListener('click', (e) => {
+                e.stopPropagation(); openEditModal(movie);
+            });
+            card.querySelector('.btn-delete-admin')?.addEventListener('click', (e) => {
+                e.stopPropagation(); deleteMovie(movie.id); // Solo pasamos ID
+            });
         }
 
         // --- 8. LÓGICA DE EDICIÓN Y BORRADO (ADMIN) ---
-
-        // Abrir modal de edición con datos
         function openEditModal(movie) {
             document.getElementById('editMovieId').value = movie.id;
             document.getElementById('editVideoUrl').value = movie.video_url || '';
@@ -674,74 +664,61 @@
             document.getElementById('editYear').value = movie.year || '';
             document.getElementById('editGenre').value = movie.genre || '';
             document.getElementById('editDescription').value = movie.description || '';
-            document.getElementById('editCoverFile').value = ''; // Limpiar input file
-            editCoverPreview.src = movie.cover_url || ''; // Mostrar portada actual
+            editCoverFileInput.value = ''; // Limpiar input file
+            editCoverPreview.src = movie.cover_url || '';
             editCoverPreview.style.display = movie.cover_url ? 'block' : 'none';
-            hideError(editError); // Ocultar errores previos
+            hideError(editError);
             openModal('editModal');
         }
 
-        // Preview de portada en modal de edición
-        document.getElementById('editCoverFile').addEventListener('change', (e) => {
+        editCoverFileInput.addEventListener('change', (e) => { // Listener para preview en edición
              const file = e.target.files[0];
             if (file) {
                 const reader = new FileReader();
-                reader.onload = (event) => {
-                    editCoverPreview.src = event.target.result;
-                    editCoverPreview.style.display = 'block';
-                }
+                reader.onload = (event) => { editCoverPreview.src = event.target.result; editCoverPreview.style.display = 'block'; }
                 reader.readAsDataURL(file);
             } else {
-                 // Si quitan el archivo, mostrar la portada original si existe
                  const originalUrl = document.getElementById('editCoverUrl').value;
                  editCoverPreview.src = originalUrl || '';
                  editCoverPreview.style.display = originalUrl ? 'block' : 'none';
             }
         });
 
-        // Guardar cambios del formulario de edición
-        editForm.addEventListener('submit', async (e) => {
+        editForm.addEventListener('submit', async (e) => { // Guardar cambios editados
             e.preventDefault();
+            if (!isAdmin) return; // Seguridad extra
             saveChangesBtn.disabled = true;
             showLoader(editLoader);
             hideError(editError);
 
             const movieId = document.getElementById('editMovieId').value;
-            const coverFile = document.getElementById('editCoverFile').files[0];
-            let newCoverUrl = document.getElementById('editCoverUrl').value; // Usar URL existente por defecto
-            const oldCoverUrl = document.getElementById('editCoverUrl').value; // Para borrarla si se cambia
+            const coverFile = editCoverFileInput.files[0];
+            let newCoverUrl = document.getElementById('editCoverUrl').value; // Default: no cambiar
 
             try {
-                // 1. Si hay nueva portada, subirla y obtener nueva URL
+                // Subir nueva portada si se seleccionó
                 if (coverFile) {
                     const { presignedUrl, publicUrl } = await getUploadUrl('get-image-presigned-url', coverFile);
                     await uploadFileDirectly(presignedUrl, coverFile);
-                    newCoverUrl = publicUrl; // Sobrescribir con la nueva URL
-
-                    // Borrar portada antigua de R2 (simplificado, sin llamar a función delete)
-                    // console.warn("La portada antigua en R2 no se borrará automáticamente en esta versión.");
-                    // Idealmente llamarías a deleteR2Object(oldCoverUrl) aquí si tuvieras la función
+                    newCoverUrl = publicUrl; // Actualizar URL
+                    // NOTA: La portada antigua en R2 no se borra en esta versión simplificada
                 }
 
-                // 2. Actualizar datos en Supabase DB
+                // Actualizar datos en Supabase
                 const updates = {
                     title: document.getElementById('editTitle').value,
                     year: document.getElementById('editYear').value || null,
                     genre: document.getElementById('editGenre').value || null,
                     description: document.getElementById('editDescription').value || null,
-                    cover_url: newCoverUrl || null // Guardar nueva URL o null
+                    cover_url: newCoverUrl || null
                 };
-
-                const { error: updateError } = await supabaseClient
-                    .from('movies')
-                    .update(updates)
-                    .eq('id', movieId);
-
-                if (updateError) throw updateError;
+                const { error } = await supabaseClient.from('movies').update(updates).eq('id', movieId);
+                if (error) throw error;
 
                 alert('Película actualizada.');
                 closeModal('editModal');
-                loadMovies(); // Recargar
+                // Actualizar tarjeta específica en el DOM o recargar todo
+                loadMovies(); // Más simple recargar
 
             } catch (error) {
                 console.error("Error al guardar:", error);
@@ -752,34 +729,26 @@
             }
         });
 
-        // Borrar película (solo de la DB)
-        async function deleteMovie(movieId, videoUrl, coverUrl) {
-             if (!isAdmin) return; // Doble check
-             if (!confirm(`¿Eliminar "${document.querySelector(`[data-movie-id="${movieId}"] .movie-title`)?.textContent || 'esta película'}"?\n\n¡Los archivos en R2 NO se borrarán!`)) {
+        // Borrar película (SOLO de la DB Supabase)
+        async function deleteMovie(movieId) {
+             if (!isAdmin) return;
+             const movieCard = document.querySelector(`[data-movie-id="${movieId}"]`);
+             const movieTitle = movieCard?.querySelector('.movie-title')?.textContent || 'esta película';
+
+             if (!confirm(`¿Eliminar "${movieTitle}" de la base de datos?\n\n¡Los archivos en R2 NO se borrarán!`)) {
                 return;
             }
 
             try {
-                const { error } = await supabaseClient
-                    .from('movies')
-                    .delete()
-                    .eq('id', movieId);
-
+                const { error } = await supabaseClient.from('movies').delete().eq('id', movieId);
                 if (error) throw error;
-
                 alert('Película eliminada de la base de datos.');
-                // Quitar la tarjeta del DOM directamente para efecto inmediato
-                document.querySelector(`[data-movie-id="${movieId}"]`)?.remove();
-                // Opcional: loadMovies() para recargar todo
-
+                movieCard?.remove(); // Quitar del DOM
             } catch (error) {
                 console.error("Error al borrar de DB:", error);
                 alert(`Error al eliminar: ${error.message}`);
             }
         }
-
-        // Función auxiliar placeholder (no se usa si no llamas a delete-r2-object)
-        // async function deleteR2Object(objectKey) { console.warn("Borrado de R2 deshabilitado."); }
 
         // --- 9. BÚSQUEDA ---
         searchInput.addEventListener('input', () => {
@@ -791,7 +760,7 @@
             });
         });
 
-        // --- 10. INICIALIZACIÓN AL CARGAR PÁGINA ---
+        // --- 10. INICIALIZACIÓN ---
         document.addEventListener('DOMContentLoaded', checkSession);
 
     </script>
