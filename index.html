@@ -103,6 +103,38 @@
         .loader { border: 4px solid rgba(255,255,255,0.3); border-top: 4px solid #fff; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; margin-left: 10px; vertical-align: middle; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
+        /* ================================== */
+        /* --- 1. CSS PARA BARRA DE PROGRESO --- */
+        /* ================================== */
+        .progress-bar-background {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            height: 20px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin-top: 5px;
+        }
+        .progress-bar-fill {
+            width: 0%; /* Inicia en 0 */
+            height: 100%;
+            background: linear-gradient(45deg, #4ecdc4, #6aede1);
+            transition: width 0.2s ease-out; /* Suaviza el movimiento */
+        }
+        #progressContainer {
+            display: none; /* Oculto por defecto */
+            margin-bottom: 15px;
+        }
+        #progressText {
+            display: block;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #fff;
+            margin-top: 5px;
+            font-weight: 600;
+        }
+        /* ================================== */
+
         /* Footer y Scrollbar */
         footer { text-align: center; padding: 30px 20px; color: #aaa; border-top: 1px solid rgba(255, 255, 255, 0.1); margin-top: 20px; }
         .developer-info { margin-top: 10px; font-style: italic; color: #4ecdc4; }
@@ -213,6 +245,14 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="form-group" id="progressContainer">
+                    <label id="progressLabel">Subiendo...</label>
+                    <div class="progress-bar-background">
+                        <div class="progress-bar-fill" id="progressBarFill"></div>
+                    </div>
+                    <span id="progressText">0%</span>
+                </div>
                 <button type="submit" class="submit-btn" id="submitUploadBtn">
                     <i class="fas fa-upload"></i> Subir Película
                     <span id="uploadLoader" class="loader" style="display: none;"></span>
@@ -279,7 +319,7 @@
         // --- 1. CONFIGURACIÓN ---
         const SUPABASE_URL = 'https://fcpczyohzcgulbfpthuc.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZjcGN6eW9oemNndWxiZnB0aHVjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE0MDA4NzksImV4cCI6MjA3Njk3Njg3OX0.Ya3sJ2Hb0gr8pCg5CEheMDWGjSCAuPeoNcfANUTuwPk';
-        const ADMIN_EMAIL = 'klmzr230@gmail.com'; // <--- ¡¡¡TU CORREO ADMIN AQUÍ!!!
+        const ADMIN_EMAIL = 'klmzr230@gmail.com';
 
         const { createClient } = supabase;
         const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -293,9 +333,9 @@
         const movieGrid = document.getElementById('movieGrid');
         const uploadForm = document.getElementById('uploadForm');
         const editForm = document.getElementById('editForm');
-        const videoFileInput = document.getElementById('videoFile'); // Renombrado para claridad
-        const coverFileInput = document.getElementById('coverFile'); // Portada en modal subida
-        const editCoverFileInput = document.getElementById('editCoverFile'); // Portada en modal edición
+        const videoFileInput = document.getElementById('videoFile');
+        const coverFileInput = document.getElementById('coverFile');
+        const editCoverFileInput = document.getElementById('editCoverFile');
         const fileLabelText = document.getElementById('fileLabelText');
         const submitUploadBtn = document.getElementById('submitUploadBtn');
         const uploadLoader = document.getElementById('uploadLoader');
@@ -306,7 +346,13 @@
         const editLoader = document.getElementById('editLoader');
         const editError = document.getElementById('editError');
         const searchInput = document.getElementById('searchInput');
-        const modalAuthError = document.getElementById('modalAuthError'); // Error en modal auth
+        const modalAuthError = document.getElementById('modalAuthError');
+
+        // **NUEVAS REFERENCIAS PARA LA BARRA DE PROGRESO**
+        const progressContainer = document.getElementById('progressContainer');
+        const progressLabel = document.getElementById('progressLabel');
+        const progressBarFill = document.getElementById('progressBarFill');
+        const progressText = document.getElementById('progressText');
 
         let currentUser = null;
         let isAdmin = false;
@@ -332,15 +378,14 @@
                 isAdmin = false;
             } finally {
                 updateUIBasedOnAuth();
-                loadMovies(); // Siempre cargar películas
+                loadMovies(); 
             }
         }
 
         function updateUIBasedOnAuth() {
             authBtnText.textContent = currentUser ? 'Perfil' : 'Login';
             document.body.classList.toggle('admin-mode', isAdmin);
-            // Habilitar/deshabilitar botón de subir si no es admin (opcional)
-            // document.getElementById('openUploadModal').style.display = isAdmin ? 'flex' : 'none';
+            // document.getElementById('openUploadModal').style.display = isAdmin ? 'flex' : 'none'; // Descomenta si solo admin puede ver el botón
         }
 
         function renderAuthUI() {
@@ -379,18 +424,13 @@
             openModal('authModal');
         });
 
-        // =================================================================
-        // AQUÍ ESTÁ LA CORRECCIÓN: Faltaba este listener para ABRIR el modal
-        // =================================================================
+        // Listener para abrir el modal de subida
         document.getElementById('openUploadModal').addEventListener('click', () => {
-            // Opcional: puedes añadir un chequeo si solo el admin puede subir
-            // if (isAdmin) {
-            //     openModal('uploadModal');
-            // } else {
-            //     alert('Debes ser administrador para subir películas.');
-            // }
-            
-            // Por ahora, simplemente lo abre:
+             // Puedes añadir lógica de admin aquí si quieres
+             // if (!isAdmin) {
+             //    alert("Solo los administradores pueden subir películas.");
+             //    return;
+             // }
             openModal('uploadModal');
         });
 
@@ -413,7 +453,7 @@
                     isAdmin = currentUser.email === ADMIN_EMAIL;
                     updateUIBasedOnAuth();
                     closeModal('authModal');
-                    loadMovies(); // Recargar para mostrar botones admin
+                    loadMovies(); 
                     alert(`¡Bienvenido ${isAdmin ? 'Admin' : ''}!`);
                 } else {
                      throw new Error("No se recibieron datos de usuario.");
@@ -423,7 +463,7 @@
                 console.error("Login error:", error);
             } finally {
                  hideLoader(loader);
-                 if(loginBtn) loginBtn.disabled = false; // Asegura que exista
+                 if(loginBtn) loginBtn.disabled = false;
             }
         }
 
@@ -436,16 +476,14 @@
                  isAdmin = false;
                  updateUIBasedOnAuth();
                  closeModal('authModal');
-                 loadMovies(); // Recargar para ocultar botones admin
+                 loadMovies();
                  alert('Sesión cerrada.');
              }
         }
 
-        // --- 5. LÓGICA DE SUBIDA (SIMPLIFICADA CON PORTADA) ---
+        // --- 5. LÓGICA DE SUBIDA (MODIFICADA) ---
         uploadForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-
-            // Esta es la corrección anterior, que ya tenías:
             const submitBtnText = submitUploadBtn.innerHTML;
 
             const videoFile = videoFileInput.files[0];
@@ -460,18 +498,25 @@
             }
             hideError(uploadError);
             submitUploadBtn.disabled = true;
-            showLoader(uploadLoader);
+            // Ocultamos el loader del botón, usaremos la barra de progreso
+            hideLoader(uploadLoader); 
+            
+            // Resetear y mostrar la barra de progreso
+            progressContainer.style.display = 'none'; // Ocultar por si acaso
+            progressBarFill.style.width = '0%';
+            progressText.textContent = '0%';
 
             let coverPublicUrl = null;
             let videoPublicUrl = null;
 
             try {
-                // Subir Portada si existe
+                // Subir Portada (es rápida, no necesita barra de progreso)
                 if (coverFile) {
-                    submitUploadBtn.firstElementChild.className = 'fas fa-image'; // Cambiar icono
+                    submitUploadBtn.firstElementChild.className = 'fas fa-image';
                     submitUploadBtn.lastChild.textContent = ' Subiendo Portada...';
                     const { presignedUrl, publicUrl } = await getUploadUrl('get-image-presigned-url', coverFile);
-                    await uploadFileDirectly(presignedUrl, coverFile);
+                    // Usamos la nueva función, pero sin un callback de progreso
+                    await uploadFileWithProgress(presignedUrl, coverFile, () => {}); 
                     coverPublicUrl = publicUrl;
                 }
 
@@ -484,7 +529,22 @@
                 // Subir Video
                 submitUploadBtn.firstElementChild.className = 'fas fa-spinner fa-spin';
                 submitUploadBtn.lastChild.textContent = ' Subiendo Video...';
-                await uploadFileDirectly(videoPresignedUrl, videoFile);
+
+                // Mostrar la barra de progreso ANTES de empezar la subida del video
+                progressContainer.style.display = 'block';
+                progressLabel.textContent = `Subiendo: ${videoFile.name}`;
+
+                // **Definimos la función de callback para el progreso**
+                const onVideoProgress = (percent, loaded, total) => {
+                    const loadedMB = (loaded / 1024 / 1024).toFixed(1);
+                    const totalMB = (total / 1024 / 1024).toFixed(1);
+                    
+                    progressBarFill.style.width = `${percent.toFixed(2)}%`;
+                    progressText.textContent = `${percent.toFixed(0)}% (${loadedMB} MB / ${totalMB} MB)`;
+                };
+
+                // **Llamamos a la nueva función de subida con progreso**
+                await uploadFileWithProgress(videoPresignedUrl, videoFile, onVideoProgress);
 
                 // Guardar en DB
                 submitUploadBtn.firstElementChild.className = 'fas fa-database';
@@ -509,12 +569,15 @@
                 showError(uploadError, `Error: ${error.message}`);
             } finally {
                 submitUploadBtn.disabled = false;
-                hideLoader(uploadLoader);
                 submitUploadBtn.innerHTML = submitBtnText; // Restaurar botón
+                // Ocultar y resetear la barra de progreso al finalizar
+                progressContainer.style.display = 'none'; 
+                progressBarFill.style.width = '0%';
+                progressText.textContent = '0%';
             }
         });
 
-        // Función auxiliar para obtener URL firmada
+        // Función auxiliar para obtener URL firmada (sin cambios)
         async function getUploadUrl(functionName, file) {
             const { data, error } = await supabaseClient.functions.invoke(functionName, {
                 body: JSON.stringify({
@@ -528,21 +591,47 @@
             return { presignedUrl: data.presignedUrl, publicUrl: data.publicUrl };
         }
 
-        // Función auxiliar para subir archivo a R2
-        async function uploadFileDirectly(presignedUrl, file) {
-            const response = await fetch(presignedUrl, {
-                method: 'PUT',
-                headers: { 'Content-Type': file.type || 'application/octet-stream' },
-                body: file
+        // **NUEVA FUNCIÓN de subida con XMLHttpRequest (XHR)**
+        function uploadFileWithProgress(presignedUrl, file, onProgress) {
+            return new Promise((resolve, reject) => {
+                const xhr = new XMLHttpRequest();
+                xhr.open('PUT', presignedUrl);
+                
+                // Asignamos el Content-Type que R2 espera
+                xhr.setRequestHeader('Content-Type', file.type || 'application/octet-stream');
+                // IMPORTANTE: También debes añadir 'host' al CORS de tu bucket en R2
+
+                // Evento para rastrear el progreso de la subida
+                xhr.upload.onprogress = (event) => {
+                    if (event.lengthComputable) {
+                        const percent = (event.loaded / event.total) * 100;
+                        onProgress(percent, event.loaded, event.total); // Llamamos al callback
+                    }
+                };
+
+                // Evento cuando la subida se completa
+                xhr.onload = () => {
+                    if (xhr.status >= 200 && xhr.status < 300) {
+                        // Éxito
+                        resolve(xhr.response);
+                    } else {
+                        // Error (intentamos parsear el error de R2)
+                        const match = xhr.responseText.match(/<Message>(.*?)<\/Message>/);
+                        const r2Message = match ? match[1] : `Status ${xhr.status}`;
+                        reject(new Error(`Falló subida a R2 (${file.name}): ${r2Message}.`));
+                    }
+                };
+
+                // Evento para errores de red
+                xhr.onerror = () => {
+                    reject(new Error('Error de red durante la subida.'));
+                };
+
+                // Iniciar la subida
+                xhr.send(file);
             });
-            if (!response.ok) {
-                const errorText = await response.text();
-                console.error(`Error subiendo ${file.name} a R2:`, errorText);
-                const match = errorText.match(/<Message>(.*?)<\/Message>/);
-                const r2Message = match ? match[1] : `Status ${response.status}`;
-                throw new Error(`Falló subida a R2 (${file.name}): ${r2Message}.`);
-            }
         }
+
 
          // Preview de portada en modal de subida
         coverFileInput.addEventListener('change', (e) => {
@@ -625,8 +714,8 @@
                     </div>
                 </div>
             `;
-            addCardListeners(card, movie); // Añadir listeners ANTES de añadir al DOM
-            movieGrid.appendChild(card); // Usar appendChild para mantener el orden de carga
+            addCardListeners(card, movie); 
+            movieGrid.appendChild(card); 
         }
 
         // --- 7. LISTENERS DE TARJETAS (PLAY, LIKE, ADMIN) ---
@@ -635,7 +724,7 @@
             const video = card.querySelector('video');
             const cover = card.querySelector('.movie-cover');
 
-            playButton?.addEventListener('click', () => { // Usar ? por si acaso
+            playButton?.addEventListener('click', () => { 
                 if (cover) cover.style.opacity = '0';
                 if (playButton) playButton.style.display = 'none';
                 if (video) {
@@ -651,7 +740,7 @@
             });
 
             const likeButton = card.querySelector('.like-btn');
-            likeButton?.addEventListener('click', function() { /* ... lógica like ... */
+            likeButton?.addEventListener('click', function() { 
                 const icon = this.querySelector('i');
                 const countEl = this.querySelector('span');
                 let currentCount = parseFloat(countEl.textContent) || 0;
@@ -664,12 +753,12 @@
                 }
             });
 
-            // Listeners Admin (solo se adjuntan si los botones existen)
+            // Listeners Admin
             card.querySelector('.btn-edit-admin')?.addEventListener('click', (e) => {
                 e.stopPropagation(); openEditModal(movie);
             });
             card.querySelector('.btn-delete-admin')?.addEventListener('click', (e) => {
-                e.stopPropagation(); deleteMovie(movie.id); // Solo pasamos ID
+                e.stopPropagation(); deleteMovie(movie.id); 
             });
         }
 
@@ -682,14 +771,14 @@
             document.getElementById('editYear').value = movie.year || '';
             document.getElementById('editGenre').value = movie.genre || '';
             document.getElementById('editDescription').value = movie.description || '';
-            editCoverFileInput.value = ''; // Limpiar input file
+            editCoverFileInput.value = ''; 
             editCoverPreview.src = movie.cover_url || '';
             editCoverPreview.style.display = movie.cover_url ? 'block' : 'none';
             hideError(editError);
             openModal('editModal');
         }
 
-        editCoverFileInput.addEventListener('change', (e) => { // Listener para preview en edición
+        editCoverFileInput.addEventListener('change', (e) => { 
              const file = e.target.files[0];
             if (file) {
                 const reader = new FileReader();
@@ -702,24 +791,24 @@
             }
         });
 
-        editForm.addEventListener('submit', async (e) => { // Guardar cambios editados
+        editForm.addEventListener('submit', async (e) => { 
             e.preventDefault();
-            if (!isAdmin) return; // Seguridad extra
+            if (!isAdmin) return; 
             saveChangesBtn.disabled = true;
             showLoader(editLoader);
             hideError(editError);
 
             const movieId = document.getElementById('editMovieId').value;
             const coverFile = editCoverFileInput.files[0];
-            let newCoverUrl = document.getElementById('editCoverUrl').value; // Default: no cambiar
+            let newCoverUrl = document.getElementById('editCoverUrl').value; 
 
             try {
                 // Subir nueva portada si se seleccionó
                 if (coverFile) {
                     const { presignedUrl, publicUrl } = await getUploadUrl('get-image-presigned-url', coverFile);
-                    await uploadFileDirectly(presignedUrl, coverFile);
-                    newCoverUrl = publicUrl; // Actualizar URL
-                    // NOTA: La portada antigua en R2 no se borra en esta versión simplificada
+                    // Usamos la nueva función sin progreso, ya que es una imagen pequeña
+                    await uploadFileWithProgress(presignedUrl, coverFile, () => {}); 
+                    newCoverUrl = publicUrl; 
                 }
 
                 // Actualizar datos en Supabase
@@ -735,8 +824,7 @@
 
                 alert('Película actualizada.');
                 closeModal('editModal');
-                // Actualizar tarjeta específica en el DOM o recargar todo
-                loadMovies(); // Más simple recargar
+                loadMovies(); 
 
             } catch (error) {
                 console.error("Error al guardar:", error);
