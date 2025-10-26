@@ -430,6 +430,11 @@
         uploadForm.addEventListener('submit', async (e) => {
             e.preventDefault();
 
+            // =================================================================
+            // AQUÍ ESTÁ LA CORRECCIÓN: Esta línea define la variable
+            // =================================================================
+            const submitBtnText = submitUploadBtn.innerHTML;
+
             const videoFile = videoFileInput.files[0];
             const coverFile = coverFileInput.files[0];
             const title = document.getElementById('movieTitle').value;
@@ -736,28 +741,28 @@
              const movieTitle = movieCard?.querySelector('.movie-title')?.textContent || 'esta película';
 
              if (!confirm(`¿Eliminar "${movieTitle}" de la base de datos?\n\n¡Los archivos en R2 NO se borrarán!`)) {
-                return;
-            }
+                 return;
+             }
 
-            try {
-                const { error } = await supabaseClient.from('movies').delete().eq('id', movieId);
-                if (error) throw error;
-                alert('Película eliminada de la base de datos.');
-                movieCard?.remove(); // Quitar del DOM
-            } catch (error) {
-                console.error("Error al borrar de DB:", error);
-                alert(`Error al eliminar: ${error.message}`);
-            }
+             try {
+                 const { error } = await supabaseClient.from('movies').delete().eq('id', movieId);
+                 if (error) throw error;
+                 alert('Película eliminada de la base de datos.');
+                 movieCard?.remove(); // Quitar del DOM
+             } catch (error) {
+                 console.error("Error al borrar de DB:", error);
+                 alert(`Error al eliminar: ${error.message}`);
+             }
         }
 
         // --- 9. BÚSQUEDA ---
         searchInput.addEventListener('input', () => {
              const searchTerm = searchInput.value.toLowerCase().trim();
-            const allCards = movieGrid.querySelectorAll('.movie-card');
-            allCards.forEach(card => {
-                const title = card.getAttribute('data-title') || '';
-                card.style.display = title.includes(searchTerm) ? 'flex' : 'none';
-            });
+             const allCards = movieGrid.querySelectorAll('.movie-card');
+             allCards.forEach(card => {
+                 const title = card.getAttribute('data-title') || '';
+                 card.style.display = title.includes(searchTerm) ? 'flex' : 'none';
+             });
         });
 
         // --- 10. INICIALIZACIÓN ---
