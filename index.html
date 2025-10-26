@@ -3,9 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KLMZ PELIS - Sube y Comparte Películas</title>
+    <title>KLMZ PELIS - Con Supabase y R2</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <style>
+        /* --- ESTILOS CSS COMPLETOS --- */
         * {
             margin: 0;
             padding: 0;
@@ -58,8 +62,7 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-
-        /* --- NUEVO: Estilos de la Barra de Búsqueda --- */
+        
         .search-bar {
             position: relative;
             flex-grow: 1;
@@ -90,8 +93,6 @@
             border-color: #ff6b6b;
             box-shadow: 0 0 15px rgba(255, 107, 107, 0.3);
         }
-        /* --- FIN: Estilos de la Barra de Búsqueda --- */
-
 
         .upload-btn {
             background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
@@ -106,7 +107,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            flex-shrink: 0; /* Evita que el botón se encoja */
+            flex-shrink: 0;
         }
 
         .upload-btn:hover {
@@ -179,7 +180,7 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            display: none;
+            display: none; /* Oculto hasta dar play */
         }
 
         .play-button {
@@ -193,6 +194,7 @@
             cursor: pointer;
             transition: all 0.3s ease;
             z-index: 2;
+            position: absolute; /* Aseguramos que esté centrado */
         }
 
         .play-button:hover {
@@ -264,8 +266,7 @@
         .stat i {
             color: #ff6b6b;
         }
-
-        /* Modal de subida */
+        
         .modal {
             display: none;
             position: fixed;
@@ -276,7 +277,7 @@
             background: rgba(0, 0, 0, 0.8);
             z-index: 1000;
             backdrop-filter: blur(10px);
-            overflow-y: auto; /* Permite scroll si el modal es muy largo */
+            overflow-y: auto;
         }
 
         .modal-content {
@@ -328,18 +329,17 @@
 
         .form-group input,
         .form-group textarea,
-        .form-group select { /* --- MODIFICADO: Se añade 'select' --- */
+        .form-group select {
             padding: 12px;
             background: rgba(0, 0, 0, 0.3);
             border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 10px;
             color: white;
-            font-size: 1rem; /* Asegura tamaño de fuente consistente */
+            font-size: 1rem;
         }
-
-        /* --- NUEVO: Estilo para el select --- */
+        
         .form-group select {
-            appearance: none; /* Quita apariencia nativa */
+            appearance: none;
             background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%234ecdc4' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
             background-repeat: no-repeat;
             background-position: right 12px center;
@@ -350,8 +350,6 @@
             background: #16213e;
             color: white;
         }
-        /* --- FIN: Estilo para el select --- */
-
 
         .form-group textarea {
             resize: vertical;
@@ -404,6 +402,15 @@
             cursor: pointer;
             transition: all 0.3s ease;
         }
+        
+        /* Estilo para el botón de subida mientras está cargando */
+        .submit-btn:disabled {
+            background: #aaa;
+            cursor: not-allowed;
+            opacity: 0.7;
+            transform: none;
+            box-shadow: none;
+        }
 
         .submit-btn:hover {
             transform: translateY(-2px);
@@ -424,7 +431,7 @@
             color: #4ecdc4;
         }
 
-        /* Scrollbar personalizado */
+        /* --- Scrollbar y Responsive CSS --- */
         ::-webkit-scrollbar {
             width: 8px;
         }
@@ -438,7 +445,6 @@
             border-radius: 4px;
         }
 
-        /* Responsive para pantallas muy grandes */
         @media (min-width: 1800px) {
             .container {
                 max-width: 1600px;
@@ -453,7 +459,6 @@
             }
         }
 
-        /* Responsive para pantallas medianas */
         @media (max-width: 1200px) {
             .movie-grid {
                 grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
@@ -464,7 +469,6 @@
             }
         }
 
-        /* Responsive para tablets */
         @media (max-width: 768px) {
             .movie-grid {
                 grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -482,19 +486,18 @@
             .search-bar {
                 max-width: 100%;
                 width: 100%;
-                order: 2; /* Pone la búsqueda después del logo */
+                order: 2;
             }
 
             .upload-btn {
-                order: 3; /* Pone el botón al final */
+                order: 3;
             }
 
             .logo {
-                order: 1; /* Pone el logo primero */
+                order: 1;
             }
         }
 
-        /* Responsive para móviles */
         @media (max-width: 480px) {
             .movie-grid {
                 grid-template-columns: 1fr;
@@ -537,119 +540,8 @@
                     <i class="fas fa-movie"></i>
                     Películas Recientes
                 </h2>
-                <div class="movie-grid">
-                    <div class="movie-card">
-                        <div class="movie-player" data-video="https://example.cloudflare.com/video1.mp4">
-                            <video controls>
-                                <source type="video/mp4">
-                                Tu navegador no soporta la reproducción de video.
-                            </video>
-                            <button class="play-button">
-                                <i class="fas fa-play"></i>
-                            </button>
-                        </div>
-                        <div class="movie-info">
-                            <h3 class="movie-title">El Viaje de Chihiro</h3>
-                            <div class="movie-meta">
-                                <span>2001 • Animación</span>
-                                <span>⭐ 8.6</span>
-                            </div>
-                            <div class="movie-actions">
-                                <button class="like-btn">
-                                    <i class="far fa-heart"></i>
-                                    <span>1.2K</span>
-                                </button>
-                                <div class="movie-stats">
-                                    <span class="stat"><i class="fas fa-eye"></i> 12K</span>
-                                </div>
-                            </div>
-                        </div>
+                <div class="movie-grid" id="movieGrid">
                     </div>
-
-                    <div class="movie-card">
-                        <div class="movie-player" data-video="https://example.cloudflare.com/video2.mp4">
-                            <video controls>
-                                <source type="video/mp4">
-                                Tu navegador no soporta la reproducción de video.
-                            </video>
-                            <button class="play-button">
-                                <i class="fas fa-play"></i>
-                            </button>
-                        </div>
-                        <div class="movie-info">
-                            <h3 class="movie-title">Inception</h3>
-                            <div class="movie-meta">
-                                <span>2010 • Ciencia Ficción</span>
-                                <span>⭐ 8.8</span>
-                            </div>
-                            <div class="movie-actions">
-                                <button class="like-btn">
-                                    <i class="far fa-heart"></i>
-                                    <span>2.5K</span>
-                                </button>
-                                <div class="movie-stats">
-                                    <span class="stat"><i class="fas fa-eye"></i> 28K</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="movie-card">
-                        <div class="movie-player" data-video="https://example.cloudflare.com/video3.mp4">
-                            <video controls>
-                                <source type="video/mp4">
-                                Tu navegador no soporta la reproducción de video.
-                            </video>
-                            <button class="play-button">
-                                <i class="fas fa-play"></i>
-                            </button>
-                        </div>
-                        <div class="movie-info">
-                            <h3 class="movie-title">Parásitos</h3>
-                            <div class="movie-meta">
-                                <span>2019 • Drama</span>
-                                <span>⭐ 8.5</span>
-                            </div>
-                            <div class="movie-actions">
-                                <button class="like-btn">
-                                    <i class="far fa-heart"></i>
-                                    <span>1.8K</span>
-                                </button>
-                                <div class="movie-stats">
-                                    <span class="stat"><i class="fas fa-eye"></i> 19K</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="movie-card">
-                        <div class="movie-player" data-video="https://example.cloudflare.com/video4.mp4">
-                            <video controls>
-                                <source type="video/mp4">
-                                Tu navegador no soporta la reproducción de video.
-                            </video>
-                            <button class="play-button">
-                                <i class="fas fa-play"></i>
-                            </button>
-                        </div>
-                        <div class="movie-info">
-                            <h3 class="movie-title">El Caballero de la Noche</h3>
-                            <div class="movie-meta">
-                                <span>2008 • Acción</span>
-                                <span>⭐ 9.0</span>
-                            </div>
-                            <div class="movie-actions">
-                                <button class="like-btn">
-                                    <i class="far fa-heart"></i>
-                                    <span>3.1K</span>
-                                </button>
-                                <div class="movie-stats">
-                                    <span class="stat"><i class="fas fa-eye"></i> 35K</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
 
@@ -683,6 +575,9 @@
                         <option value="Accion">Acción</option>
                         <option value="Suspenso">Suspenso</option>
                         <option value="Ciencia Ficcion">Ciencia Ficción</option>
+                        <option value="Drama">Drama</option>
+                        <option value="Comedia">Comedia</option>
+                        <option value="Animacion">Animación</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -695,12 +590,12 @@
                         <input type="file" id="videoFile" class="file-input" accept="video/mp4" required>
                         <div class="file-label">
                             <i class="fas fa-cloud-upload-alt"></i>
-                            <span>Selecciona tu archivo de video (.mp4)</span>
-                            <small>Soporte para Cloudflare R2 - Hasta 2GB</small>
+                            <span id="fileLabelText">Selecciona tu archivo de video (.mp4)</span>
+                            <small>Soporte para Cloudflare R2</small>
                         </div>
                     </div>
                 </div>
-                <button type="submit" class="submit-btn">
+                <button type="submit" class="submit-btn" id="submitUploadBtn">
                     <i class="fas fa-upload"></i> Subir a Cloudflare R2
                 </button>
             </form>
@@ -708,17 +603,31 @@
     </div>
 
     <script>
-        // Funcionalidad del modal de subida
+        // --- 1. INICIALIZACIÓN DE SUPABASE (FRONTEND) ---
+        // ¡Estas son tus claves de proyecto!
+        const SUPABASE_URL = 'https://fcpczyohzcgulbfpthuc.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZjcGN6eW9oemNndWxiZnB0aHVjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE0MDA4NzksImV4cCI6MjA3Njk3Njg3OX0.Ya3sJ2Hb0gr8pCg5CEheMDWGjSCAuPeoNcfANUTuwPk';
+
+        const { createClient } = supabase; // Accede desde el CDN
+        const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // --- 2. REFERENCIAS A ELEMENTOS DEL DOM ---
         const uploadModal = document.getElementById('uploadModal');
         const openUploadModal = document.getElementById('openUploadModal');
-        const closeModal = document.getElementById('closeModal');
+        const closeModalBtn = document.getElementById('closeModal');
         const uploadForm = document.getElementById('uploadForm');
+        const submitUploadBtn = document.getElementById('submitUploadBtn');
+        const movieGrid = document.getElementById('movieGrid');
+        const searchInput = document.getElementById('searchInput');
+        const fileInput = document.getElementById('videoFile');
+        const fileLabelText = document.getElementById('fileLabelText');
 
+        // --- 3. LÓGICA DEL MODAL ---
         openUploadModal.addEventListener('click', () => {
             uploadModal.style.display = 'block';
         });
 
-        closeModal.addEventListener('click', () => {
+        closeModalBtn.addEventListener('click', () => {
             uploadModal.style.display = 'none';
         });
 
@@ -728,94 +637,197 @@
             }
         });
 
-        uploadForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const fileInput = document.getElementById('videoFile');
-            const fileName = fileInput.files[0]?.name || 'archivo.mp4';
-            
-            // --- NUEVO: Obtener valor del select de categoría ---
-            const category = document.getElementById('movieGenre').value;
-            
-            alert(`¡Película preparada para subir a Cloudflare R2!\n\n` +
-                  `En una implementación real, este formulario:\n` +
-                  `1. Subiría el archivo a Cloudflare R2\n` +
-                  `2. Guardaría los metadatos (incluyendo la categoría '${category}') en la BD\n` +
-                  `3. Generaría una URL pública para la reproducción\n\n` +
-                  `Archivo: ${fileName}\n` +
-                  `URL de Cloudflare R2: https://[account].r2.cloudflarestorage.com/[bucket]/${fileName}`);
-            
-            uploadModal.style.display = 'none';
-            uploadForm.reset();
+        // Actualizar el texto del input de archivo
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files.length > 0) {
+                fileLabelText.textContent = fileInput.files[0].name;
+            } else {
+                fileLabelText.textContent = 'Selecciona tu archivo de video (.mp4)';
+            }
         });
 
-        // --- MODIFICADO: Funcionalidad de reproducción de videos (Integración R2) ---
-        document.querySelectorAll('.play-button').forEach(button => {
-            button.addEventListener('click', function() {
-                const moviePlayer = this.parentElement;
-                const video = moviePlayer.querySelector('video');
-                const source = video.querySelector('source');
-                const playButton = this;
-                
-                // Obtiene la URL de R2 desde el atributo data-video
-                const videoUrl = moviePlayer.getAttribute('data-video');
+        // --- 4. LÓGICA DE SUBIDA (LLAMADA A LA EDGE FUNCTION) ---
+        uploadForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const title = document.getElementById('movieTitle').value;
+            const year = document.getElementById('movieYear').value;
+            const genre = document.getElementById('movieGenre').value;
+            const description = document.getElementById('movieDescription').value;
+            const file = fileInput.files[0];
 
-                // Si el 'src' del video no está asignado, asígnalo
-                if (!source.getAttribute('src')) {
-                    source.setAttribute('src', videoUrl);
-                    video.load(); // Carga el nuevo video
+            if (!file) {
+                alert('Por favor, selecciona un archivo de video.');
+                return;
+            }
+
+            // Deshabilitar botón para evitar envíos múltiples
+            submitUploadBtn.disabled = true;
+            submitUploadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Subiendo...';
+
+            try {
+                // Crear FormData para enviar a la Edge Function
+                const formData = new FormData();
+                formData.append('videoFile', file);
+                formData.append('title', title);
+                formData.append('year', year);
+                formData.append('genre', genre);
+                formData.append('description', description);
+
+                // Invocar la Edge Function 'upload-to-r2'
+                const { data, error } = await supabaseClient.functions.invoke('upload-to-r2', {
+                    body: formData,
+                });
+
+                if (error) {
+                    throw error; // Lanza el error para que sea capturado por el catch
                 }
                 
-                // Muestra el video y oculta el botón
-                video.style.display = 'block';
-                playButton.style.display = 'none';
-                video.play();
-            });
+                // data.movie contiene la película insertada que devolvió la función
+                if (data.movie) {
+                    alert('¡Película subida con éxito!');
+                    uploadModal.style.display = 'none';
+                    uploadForm.reset();
+                    fileLabelText.textContent = 'Selecciona tu archivo de video (.mp4)';
+                    
+                    // Añadir la nueva película al grid sin recargar toda la página
+                    addMovieCardToGrid(data.movie);
+                } else {
+                    // Manejar el caso donde la función no devuelva error, pero sí un mensaje
+                    // (como el "No se encontró el archivo" si visitas la URL)
+                    throw new Error(data.error || 'Respuesta inesperada de la función.');
+                }
+
+            } catch (error) {
+                console.error('Error al subir:', error);
+                alert(`Error al subir la película: ${error.message}`);
+            } finally {
+                // Reactivar el botón pase lo que pase
+                submitUploadBtn.disabled = false;
+                submitUploadBtn.innerHTML = '<i class="fas fa-upload"></i> Subir a Cloudflare R2';
+            }
         });
 
-        // --- MODIFICADO: Funcionalidad básica para los botones de like (Corregida) ---
-        document.querySelectorAll('.like-btn').forEach(button => {
-            button.addEventListener('click', function() {
+        // --- 5. FUNCIÓN PARA CARGAR PELÍCULAS DESDE LA DB ---
+        async function loadMovies() {
+            const { data: movies, error } = await supabaseClient
+                .from('movies')
+                .select('*')
+                .order('created_at', { ascending: false }); // Mostrar las más nuevas primero
+
+            if (error) {
+                console.error('Error al cargar películas:', error);
+                movieGrid.innerHTML = '<p style="color: #ff6b6b;">Error al cargar las películas.</p>';
+                return;
+            }
+
+            if (movies.length === 0) {
+                movieGrid.innerHTML = '<p>No hay películas subidas todavía. ¡Sé el primero!</p>';
+                return;
+            }
+
+            // Limpiar el grid antes de llenarlo
+            movieGrid.innerHTML = '';
+            // Añadir cada película al DOM
+            movies.forEach(addMovieCardToGrid);
+        }
+
+        // --- 6. FUNCIÓN PARA CREAR Y AÑADIR UNA TARJETA DE PELÍCULA ---
+        function addMovieCardToGrid(movie) {
+            const card = document.createElement('div');
+            card.className = 'movie-card';
+            card.setAttribute('data-title', movie.title.toLowerCase()); // Para la búsqueda
+
+            // Formatear likes y views (puedes ajustar esta lógica)
+            const likes = (movie.likes / 1000).toFixed(1) + 'K';
+            const views = (movie.views / 1000).toFixed(1) + 'K';
+
+            card.innerHTML = `
+                <div class="movie-player" data-video="${movie.video_url}">
+                    <video controls>
+                        <source src="${movie.video_url}" type="video/mp4">
+                        Tu navegador no soporta la reproducción de video.
+                    </video>
+                    <button class="play-button">
+                        <i class="fas fa-play"></i>
+                    </button>
+                </div>
+                <div class="movie-info">
+                    <h3 class="movie-title">${movie.title}</h3>
+                    <div class="movie-meta">
+                        <span>${movie.year} • ${movie.genre}</span>
+                        <span>⭐ --</span> </div>
+                    <div class="movie-actions">
+                        <button class="like-btn" data-movie-id="${movie.id}">
+                            <i class="far fa-heart"></i>
+                            <span>${likes}</span>
+                        </button>
+                        <div class="movie-stats">
+                            <span class="stat"><i class="fas fa-eye"></i> ${views}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Añadir la tarjeta al inicio del grid (para que la nueva aparezca primero)
+            movieGrid.prepend(card);
+            
+            // Añadir listeners a los nuevos botones
+            addCardListeners(card);
+        }
+
+        // --- 7. FUNCIONALIDAD DE REPRODUCCIÓN Y LIKES (PARA CADA TARJETA) ---
+        function addCardListeners(card) {
+            // Listener del botón de Play
+            const playButton = card.querySelector('.play-button');
+            const video = card.querySelector('video');
+
+            playButton.addEventListener('click', function() {
+                video.style.display = 'block'; // Muestra el video
+                playButton.style.display = 'none'; // Oculta el botón
+                video.play();
+            });
+
+            // Listener del botón de Like (simulado)
+            // (En un futuro, puedes hacer que este botón actualice la DB de Supabase)
+            const likeButton = card.querySelector('.like-btn');
+            likeButton.addEventListener('click', function() {
                 const icon = this.querySelector('i');
                 const countEl = this.querySelector('span');
-                let currentCount = parseFloat(countEl.textContent); // Usar parseFloat para '1.2K'
-                
-                // Comprueba si el icono es 'fas' (sólido, o sea, "ya le diste like")
+                let currentCount = parseFloat(countEl.textContent);
+
                 if (icon.classList.contains('fas')) {
-                    // Quitar like
                     icon.classList.remove('fas');
-                    icon.classList.add('far'); // Cambia a 'far' (regular/vacío)
-                    icon.style.color = '#ff6b6b';
-                    // Lógica para decrementar 'K' (simplificada)
+                    icon.classList.add('far');
                     countEl.textContent = (currentCount - 0.1).toFixed(1) + 'K';
                     this.style.background = 'rgba(255, 107, 107, 0.2)';
                 } else {
-                    // Dar like
                     icon.classList.remove('far');
-                    icon.classList.add('fas'); // Cambia a 'fas' (sólido/lleno)
-                    icon.style.color = '#ff6b6b';
-                     // Lógica para incrementar 'K' (simplificada)
+                    icon.classList.add('fas');
                     countEl.textContent = (currentCount + 0.1).toFixed(1) + 'K';
                     this.style.background = 'rgba(255, 107, 107, 0.4)';
                 }
             });
-        });
+        }
 
-        // --- NUEVO: Funcionalidad de Búsqueda en Tiempo Real ---
-        const searchInput = document.getElementById('searchInput');
-        const movieCards = document.querySelectorAll('.movie-card');
-
+        // --- 8. FUNCIONALIDAD DE BÚSQUEDA ---
         searchInput.addEventListener('input', function(e) {
             const searchTerm = e.target.value.toLowerCase();
+            const allCards = movieGrid.querySelectorAll('.movie-card');
 
-            movieCards.forEach(card => {
-                const title = card.querySelector('.movie-title').textContent.toLowerCase();
-                
+            allCards.forEach(card => {
+                const title = card.getAttribute('data-title');
                 if (title.includes(searchTerm)) {
-                    card.style.display = 'flex'; // Muestra la tarjeta
+                    card.style.display = 'flex';
                 } else {
-                    card.style.display = 'none'; // Oculta la tarjeta
+                    card.style.display = 'none';
                 }
             });
+        });
+
+        // --- 9. CARGA INICIAL DE PELÍCULAS ---
+        document.addEventListener('DOMContentLoaded', () => {
+            loadMovies();
         });
 
     </script>
