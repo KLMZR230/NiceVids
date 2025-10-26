@@ -246,7 +246,7 @@
                 const uploadResponse = await fetch(presignedUrl, {
                     method: 'PUT',
                     headers: {
-                        // Solo enviar Content-Type. Host se añade automáticamente.
+                        // Solo enviar Content-Type. Host se añade automáticamente por el navegador.
                         'Content-Type': file.type || 'application/octet-stream',
                     },
                     body: file
@@ -307,7 +307,6 @@
 
         // --- 5. FUNCIÓN PARA CARGAR PELÍCULAS DESDE LA DB ---
         async function loadMovies() {
-            // Mostrar mensaje de carga inicial
             movieGrid.innerHTML = '<p style="text-align: center; grid-column: 1 / -1;">Cargando películas...</p>';
 
             const { data: movies, error } = await supabaseClient
@@ -315,7 +314,6 @@
                 .select('*')
                 .order('created_at', { ascending: false });
 
-            // Limpiar grid antes de añadir o mostrar errores/mensajes
             movieGrid.innerHTML = '';
 
             if (error) {
