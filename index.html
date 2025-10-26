@@ -13,64 +13,78 @@
         body { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); color: #fff; min-height: 100vh; }
         .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
         header { background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(10px); padding: 20px 0; margin-bottom: 30px; border-bottom: 2px solid #ff6b6b; }
-        .header-content { display: flex; justify-content: space-between; align-items: center; gap: 20px; }
+        .header-content { display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; /* Para mejor adaptabilidad */ }
         .logo { display: flex; align-items: center; gap: 15px; }
         .logo i { font-size: 2.5rem; color: #ff6b6b; }
         .logo h1 { font-size: 2.2rem; font-weight: 700; background: linear-gradient(45deg, #ff6b6b, #4ecdc4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .search-bar { position: relative; flex-grow: 1; max-width: 500px; }
+        .search-bar { position: relative; flex-grow: 1; max-width: 500px; min-width: 200px; /* Evita que sea demasiado pequeño */ }
         .search-bar i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #aaa; }
         .search-bar input { width: 100%; padding: 12px 12px 12px 40px; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 50px; color: white; font-size: 1rem; outline: none; transition: all 0.3s ease; }
         .search-bar input:focus { border-color: #ff6b6b; box-shadow: 0 0 15px rgba(255, 107, 107, 0.3); }
-        .upload-btn { background: linear-gradient(45deg, #ff6b6b, #ff8e8e); color: white; border: none; padding: 12px 30px; font-size: 1.1rem; font-weight: 600; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+        .upload-btn { background: linear-gradient(45deg, #ff6b6b, #ff8e8e); color: white; border: none; padding: 12px 30px; font-size: 1.1rem; font-weight: 600; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; gap: 10px; flex-shrink: 0; white-space: nowrap; /* Evita que el texto se rompa */ }
         .upload-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(255, 107, 107, 0.4); }
         .main-content { display: grid; grid-template-columns: 1fr; gap: 30px; margin-bottom: 40px; }
         .movie-section { background: rgba(255, 255, 255, 0.08); border-radius: 20px; padding: 30px; backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
         .section-title { font-size: 2rem; margin-bottom: 25px; color: #4ecdc4; display: flex; align-items: center; gap: 10px; }
-        .movie-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 30px; }
+        .movie-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Ajustado para mejor responsividad */ gap: 30px; }
         .movie-card { background: rgba(0, 0, 0, 0.4); border-radius: 15px; overflow: hidden; transition: all 0.3s ease; border: 1px solid rgba(255, 255, 255, 0.1); display: flex; flex-direction: column; }
         .movie-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3); border-color: rgba(255, 107, 107, 0.3); }
-        .movie-player { width: 100%; height: 220px; background: #000; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.2rem; font-weight: 600; text-align: center; padding: 20px; position: relative; }
-        .movie-player video { width: 100%; height: 100%; object-fit: cover; display: none; }
+        .movie-player { width: 100%; /* height: 220px; */ aspect-ratio: 16 / 9; /* Mejor para videos */ background: #000; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.2rem; font-weight: 600; text-align: center; /* padding: 20px; */ position: relative; overflow: hidden; /* Asegura que el video no se salga */ }
+        .movie-player video { width: 100%; height: 100%; object-fit: cover; display: none; background-color: #000; /* Fondo negro mientras carga */ }
         .play-button { background: rgba(255, 107, 107, 0.8); border: none; color: white; width: 60px; height: 60px; border-radius: 50%; font-size: 1.5rem; cursor: pointer; transition: all 0.3s ease; z-index: 2; position: absolute; }
         .play-button:hover { background: rgba(255, 107, 107, 1); transform: scale(1.1); }
         .movie-info { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; }
-        .movie-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 10px; color: #fff; flex-grow: 1; }
-        .movie-meta { display: flex; justify-content: space-between; margin-bottom: 15px; color: #aaa; font-size: 0.9rem; }
+        .movie-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 10px; color: #fff; flex-grow: 1; /* Word break for long titles */ word-break: break-word; overflow-wrap: break-word; }
+        .movie-meta { display: flex; justify-content: space-between; align-items: center; /* Alinea verticalmente */ flex-wrap: wrap; /* Permite que se envuelva si no cabe */ gap: 10px; margin-bottom: 15px; color: #aaa; font-size: 0.9rem; }
         .movie-actions { display: flex; justify-content: space-between; align-items: center; margin-top: auto; }
         .like-btn { background: rgba(255, 107, 107, 0.2); border: 1px solid #ff6b6b; color: #ff6b6b; padding: 8px 15px; border-radius: 20px; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; gap: 8px; }
         .like-btn:hover { background: rgba(255, 107, 107, 0.4); }
         .movie-stats { display: flex; align-items: center; gap: 15px; }
         .stat { display: flex; align-items: center; gap: 5px; color: #aaa; font-size: 0.9rem; }
         .stat i { color: #ff6b6b; }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); z-index: 1000; backdrop-filter: blur(10px); overflow-y: auto; }
-        .modal-content { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); margin: 5% auto; padding: 30px; width: 90%; max-width: 600px; border-radius: 20px; border: 1px solid rgba(255, 107, 107, 0.3); }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); z-index: 1000; backdrop-filter: blur(10px); overflow-y: auto; padding: 20px; /* Añade padding para scroll en móviles */ }
+        .modal-content { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); margin: 5% auto; padding: 30px; width: 95%; /* Un poco más ancho en móviles */ max-width: 600px; border-radius: 20px; border: 1px solid rgba(255, 107, 107, 0.3); }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .modal-title { font-size: 1.8rem; color: #ff6b6b; }
-        .close-modal { background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; }
+        .close-modal { background: none; border: none; color: white; font-size: 1.8rem; /* Más grande */ cursor: pointer; padding: 5px; /* Área de toque */ line-height: 1; }
         .upload-form { display: flex; flex-direction: column; gap: 20px; }
         .form-group { display: flex; flex-direction: column; gap: 8px; }
         .form-group label { font-weight: 600; color: #4ecdc4; }
         .form-group input, .form-group textarea, .form-group select { padding: 12px; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 10px; color: white; font-size: 1rem; }
-        .form-group select { appearance: none; background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%234ecdc4' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 12px center; background-size: 1em; }
+        .form-group input[type="number"] { appearance: textfield; /* Mejora en algunos navegadores */ }
+        .form-group select { appearance: none; background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%234ecdc4' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 12px center; background-size: 1em; padding-right: 30px; /* Espacio para la flecha */ }
         .form-group select option { background: #16213e; color: white; }
         .form-group textarea { resize: vertical; min-height: 100px; }
         .file-input-container { position: relative; border: 2px dashed rgba(255, 107, 107, 0.3); border-radius: 10px; padding: 30px; text-align: center; cursor: pointer; transition: all 0.3s ease; }
         .file-input-container:hover { border-color: #ff6b6b; background: rgba(255, 107, 107, 0.1); }
-        .file-input { position: absolute; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
-        .file-label { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+        .file-input { position: absolute; top:0; left:0; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
+        .file-label { display: flex; flex-direction: column; align-items: center; gap: 10px; pointer-events: none; /* Para que el click llegue al input */ }
         .file-label i { font-size: 2.5rem; color: #ff6b6b; }
-        .submit-btn { background: linear-gradient(45deg, #ff6b6b, #ff8e8e); color: white; border: none; padding: 15px; border-radius: 10px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
+        .file-label span { word-break: break-all; /* Para nombres largos */ }
+        .submit-btn { background: linear-gradient(45deg, #ff6b6b, #ff8e8e); color: white; border: none; padding: 15px; border-radius: 10px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 10px; }
         .submit-btn:disabled { background: #aaa; cursor: not-allowed; opacity: 0.7; transform: none; box-shadow: none; }
-        .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(255, 107, 107, 0.4); }
-        footer { text-align: center; padding: 30px 0; color: #aaa; border-top: 1px solid rgba(255, 255, 255, 0.1); margin-top: 20px; }
+        .submit-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(255, 107, 107, 0.4); }
+        footer { text-align: center; padding: 30px 20px; /* Padding lateral */ color: #aaa; border-top: 1px solid rgba(255, 255, 255, 0.1); margin-top: 20px; }
         .developer-info { margin-top: 10px; font-style: italic; color: #4ecdc4; }
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.2); }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.2); border-radius: 4px; }
         ::-webkit-scrollbar-thumb { background: linear-gradient(45deg, #ff6b6b, #4ecdc4); border-radius: 4px; }
-        @media (min-width: 1800px) { .container { max-width: 1600px; } .movie-grid { grid-template-columns: repeat(auto-fill, minmax(500px, 1fr)); } .movie-player { height: 280px; } }
-        @media (max-width: 1200px) { .movie-grid { grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); } .movie-player { height: 200px; } }
-        @media (max-width: 768px) { .movie-grid { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); } .movie-player { height: 180px; } .header-content { flex-direction: column; gap: 20px; } .search-bar { max-width: 100%; width: 100%; order: 2; } .upload-btn { order: 3; } .logo { order: 1; } }
-        @media (max-width: 480px) { .movie-grid { grid-template-columns: 1fr; } .movie-player { height: 160px; } .logo h1 { font-size: 1.8rem; } }
+        /* --- Responsive Adjustments --- */
+        @media (max-width: 768px) {
+            .header-content { flex-direction: column; gap: 15px; }
+            .search-bar { max-width: 90%; order: 2; }
+            .upload-btn { order: 3; width: 90%; justify-content: center; } /* Botón más ancho */
+            .logo { order: 1; }
+            .movie-grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); } /* Más pequeño */
+            .movie-player { height: auto; aspect-ratio: 16 / 9; } /* Altura automática */
+        }
+        @media (max-width: 480px) {
+            .logo h1 { font-size: 1.8rem; }
+            .movie-grid { grid-template-columns: 1fr; } /* Una columna */
+            .section-title { font-size: 1.6rem; }
+            .modal-content { margin: 10% auto; padding: 20px;}
+            .modal-title { font-size: 1.5rem; }
+        }
     </style>
 </head>
 <body>
@@ -99,7 +113,8 @@
                     Películas Recientes
                 </h2>
                 <div class="movie-grid" id="movieGrid">
-                    </div>
+                    <p style="text-align: center; grid-column: 1 / -1;">Cargando películas...</p>
+                </div>
             </div>
         </div>
 
@@ -108,7 +123,7 @@
             <p class="developer-info">Desarrollado por Freddy Granados</p>
         </footer>
     </div>
-    
+
     <div class="modal" id="uploadModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -124,7 +139,7 @@
                     <label for="movieYear">Año</label>
                     <input type="number" id="movieYear" placeholder="2024" min="1900" max="2025" required>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="movieGenre">Género</label>
                     <select id="movieGenre" required>
@@ -194,7 +209,7 @@
         // --- 4. LÓGICA DE SUBIDA (FLUJO DE 3 PASOS CON PRESIGNED URL) ---
         uploadForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
             const file = fileInput.files[0];
             const title = document.getElementById('movieTitle').value;
             const year = document.getElementById('movieYear').value;
@@ -211,91 +226,80 @@
             try {
                 // --- PASO 1: Obtener la URL firmada de la función 'get-presigned-url' ---
                 submitUploadBtn.innerHTML = '<i class="fas fa-lock"></i> Autorizando...';
-                
+
                 const { data: urlData, error: urlError } = await supabaseClient.functions.invoke('get-presigned-url', {
-                    // Enviamos el nombre y tipo del archivo para generar la firma correcta
                     body: JSON.stringify({
                         fileName: file.name,
-                        contentType: file.type || 'application/octet-stream' // Asegura un content-type
+                        contentType: file.type || 'application/octet-stream'
                     })
                 });
 
-                // Manejo de errores al obtener la URL
-                if (urlError) throw urlError; 
+                if (urlError) throw urlError;
                 if (urlData.error) throw new Error(`Error al generar URL: ${urlData.error}`);
                 if (!urlData.presignedUrl || !urlData.publicUrl) throw new Error("Respuesta inválida al generar URL.");
 
                 const { presignedUrl, publicUrl } = urlData;
 
-                // --- PASO 2: Subir el archivo directamente a Cloudflare R2 usando la URL firmada ---
+                // --- PASO 2: Subir directamente a R2 ---
                 submitUploadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Subiendo a R2...';
-                
-                // Realizamos la petición PUT a la URL que nos dio la función
+
                 const uploadResponse = await fetch(presignedUrl, {
                     method: 'PUT',
                     headers: {
-                        // El 'Content-Type' debe coincidir con el que se usó para firmar
+                        // Solo enviar Content-Type. Host se añade automáticamente.
                         'Content-Type': file.type || 'application/octet-stream',
                     },
-                    body: file // El cuerpo de la petición es el archivo en sí
+                    body: file
                 });
 
-                // Manejo de errores en la subida a R2
                 if (!uploadResponse.ok) {
-                    const errorText = await uploadResponse.text(); // Leer el error XML de R2 si lo hay
-                    console.error("Error en la subida a R2:", errorText); 
-                    throw new Error(`Falló la subida directa a R2 (${uploadResponse.status}). Revisa la consola.`);
+                    const errorText = await uploadResponse.text();
+                    console.error("Error en la subida a R2:", errorText);
+                    const match = errorText.match(/<Message>(.*?)<\/Message>/);
+                    const r2Message = match ? match[1] : `Status ${uploadResponse.status}`;
+                    throw new Error(`Falló la subida a R2: ${r2Message}. Revisa la consola.`);
                 }
 
-                // --- PASO 3: Guardar los metadatos de la película en la base de datos de Supabase ---
+                // --- PASO 3: Guardar metadatos en Supabase ---
                 submitUploadBtn.innerHTML = '<i class="fas fa-database"></i> Guardando datos...';
 
-                // Llamamos a la segunda función 'save-movie-details'
                 const { data: movieSaveData, error: dbError } = await supabaseClient.functions.invoke('save-movie-details', {
                     body: JSON.stringify({
                         title: title,
                         year: year,
                         genre: genre,
                         description: description,
-                        video_url: publicUrl // Guardamos la URL pública que nos dio la función 1
+                        video_url: publicUrl
                     })
                 });
 
-                // Manejo de errores al guardar en la base de datos
-                if (dbError) throw dbError; 
+                if (dbError) throw dbError;
                 if (movieSaveData.error) throw new Error(`Error al guardar datos: ${movieSaveData.error}`);
-                if (!movieSaveData.movie) throw new Error("No se recibieron los datos guardados de la película.");
+                if (!movieSaveData.movie) throw new Error("No se recibieron los datos guardados.");
 
                 // --- ¡ÉXITO! ---
                 alert('¡Película subida con éxito! 🎉');
-                uploadModal.style.display = 'none'; // Cerrar modal
-                uploadForm.reset(); // Limpiar formulario
-                fileLabelText.textContent = 'Selecciona tu archivo de video (.mp4)'; // Resetear etiqueta
-                
-                // Añadir la nueva película al grid de la página
+                uploadModal.style.display = 'none';
+                uploadForm.reset();
+                fileLabelText.textContent = 'Selecciona tu archivo de video (.mp4)';
                 addMovieCardToGrid(movieSaveData.movie);
 
             } catch (error) {
-                // Captura cualquier error de los 3 pasos
                 console.error('Error en el proceso completo de subida:', error);
-                
-                // Mostrar un mensaje de error más útil
                 let friendlyMessage = "Ocurrió un error inesperado.";
-                if (error instanceof Error) {
+                 if (error instanceof Error) {
                     if (error.message.includes('non-2xx status code')) {
-                        friendlyMessage = "Error de comunicación con el servidor. Revisa los logs de las funciones en Supabase.";
-                    } else if (error.message.includes('Failed to fetch')) {
-                        friendlyMessage = "Error de red al intentar subir. Revisa tu conexión.";
+                        friendlyMessage = "Error de comunicación con la función. Revisa los logs en Supabase.";
+                    } else if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+                        friendlyMessage = "Error de red. Revisa tu conexión e inténtalo de nuevo.";
                     } else if (error.message.includes('R2')) {
-                         friendlyMessage = `Error al subir a R2: ${error.message}. Revisa la consola para detalles.`;
+                         friendlyMessage = error.message;
                     } else {
-                        friendlyMessage = error.message; // Mensaje genérico del error
+                        friendlyMessage = error.message;
                     }
                 }
                 alert(`Error al subir: ${friendlyMessage}`);
-
             } finally {
-                // Siempre reactivar el botón, incluso si hubo error
                 submitUploadBtn.disabled = false;
                 submitUploadBtn.innerHTML = submitBtnText;
             }
@@ -303,43 +307,47 @@
 
         // --- 5. FUNCIÓN PARA CARGAR PELÍCULAS DESDE LA DB ---
         async function loadMovies() {
+            // Mostrar mensaje de carga inicial
+            movieGrid.innerHTML = '<p style="text-align: center; grid-column: 1 / -1;">Cargando películas...</p>';
+
             const { data: movies, error } = await supabaseClient
                 .from('movies')
                 .select('*')
-                .order('created_at', { ascending: false }); // Ordenar por fecha de creación descendente
+                .order('created_at', { ascending: false });
+
+            // Limpiar grid antes de añadir o mostrar errores/mensajes
+            movieGrid.innerHTML = '';
 
             if (error) {
                 console.error('Error al cargar películas:', error);
-                movieGrid.innerHTML = '<p style="color: #ff6b6b; text-align: center;">Error al cargar las películas. 😥</p>';
+                movieGrid.innerHTML = '<p style="color: #ff6b6b; text-align: center; grid-column: 1 / -1;">Error al cargar las películas. 😥</p>';
                 return;
             }
             if (movies.length === 0) {
-                movieGrid.innerHTML = '<p style="text-align: center;">Aún no hay películas. ¡Sube la primera! 🚀</p>';
+                movieGrid.innerHTML = '<p style="text-align: center; grid-column: 1 / -1;">Aún no hay películas. ¡Sube la primera! 🚀</p>';
                 return;
             }
-            movieGrid.innerHTML = ''; // Limpiar grid antes de añadir
-            movies.forEach(addMovieCardToGrid); // Añadir cada película
+            movies.forEach(addMovieCardToGrid);
         }
 
         // --- 6. FUNCIÓN PARA CREAR Y AÑADIR UNA TARJETA DE PELÍCULA AL HTML ---
         function addMovieCardToGrid(movie) {
-            // Verificación para evitar errores si 'movie' es inválido
-            if (!movie || !movie.id || !movie.title || !movie.video_url) { 
+            if (!movie || !movie.id || !movie.title || !movie.video_url) {
               console.error("Datos inválidos recibidos para la tarjeta de película:", movie);
-              return; // No añadir la tarjeta si faltan datos esenciales
+              return;
             }
-            
+
             const card = document.createElement('div');
             card.className = 'movie-card';
-            card.setAttribute('data-title', movie.title.toLowerCase()); // Para la búsqueda
+            card.setAttribute('data-title', movie.title.toLowerCase());
 
-            // Usar valores por defecto si 'likes' o 'views' no existen
-            const likes = ((movie.likes || 0) / 1000).toFixed(1) + 'K'; 
-            const views = ((movie.views || 0) / 1000).toFixed(1) + 'K'; 
+            const likes = ((movie.likes || 0) / 1000).toFixed(1) + 'K';
+            const views = ((movie.views || 0) / 1000).toFixed(1) + 'K';
 
             card.innerHTML = `
                 <div class="movie-player" data-video="${movie.video_url}">
-                    <video controls preload="metadata"> <source src="${movie.video_url}" type="video/mp4">
+                    <video controls preload="metadata">
+                        <source src="${movie.video_url}" type="video/mp4">
                         Tu navegador no soporta la reproducción de video.
                     </video>
                     <button class="play-button">
@@ -350,7 +358,8 @@
                     <h3 class="movie-title">${movie.title}</h3>
                     <div class="movie-meta">
                         <span>${movie.year || 'Año desc.'} • ${movie.genre || 'Género desc.'}</span>
-                        <span>⭐ --</span> </div>
+                        <span>⭐ --</span>
+                    </div>
                     <div class="movie-actions">
                         <button class="like-btn" data-movie-id="${movie.id}">
                             <i class="far fa-heart"></i>
@@ -362,11 +371,9 @@
                     </div>
                 </div>
             `;
-            
-            // Añadir la tarjeta al inicio del grid para que aparezca primero
-            movieGrid.prepend(card); 
-            // Añadir listeners para play/like a la nueva tarjeta
-            addCardListeners(card); 
+
+            movieGrid.prepend(card);
+            addCardListeners(card);
         }
 
         // --- 7. FUNCIONALIDAD DE REPRODUCCIÓN Y LIKES (PARA CADA TARJETA) ---
@@ -374,50 +381,46 @@
             const playButton = card.querySelector('.play-button');
             const video = card.querySelector('video');
 
-            // Al hacer clic en el botón de play
             playButton.addEventListener('click', function() {
-                video.style.display = 'block'; // Mostrar el reproductor
-                playButton.style.display = 'none'; // Ocultar el botón de play
-                video.play(); // Iniciar reproducción
+                video.style.display = 'block';
+                playButton.style.display = 'none';
+                video.play();
             });
 
-            // Lógica simulada para el botón de like
             const likeButton = card.querySelector('.like-btn');
             likeButton.addEventListener('click', function() {
                 const icon = this.querySelector('i');
                 const countEl = this.querySelector('span');
-                let currentCount = parseFloat(countEl.textContent) || 0; // Usar 0 si no es número
-                
-                if (icon.classList.contains('fas')) { // Si ya tiene like
+                let currentCount = parseFloat(countEl.textContent) || 0;
+
+                if (icon.classList.contains('fas')) {
                     icon.classList.remove('fas');
-                    icon.classList.add('far'); // Cambiar a corazón vacío
-                    countEl.textContent = Math.max(0, currentCount - 0.1).toFixed(1) + 'K'; // Decrementar (sin negativos)
-                    this.style.background = 'rgba(255, 107, 107, 0.2)'; // Estilo 'no like'
-                } else { // Si no tiene like
+                    icon.classList.add('far');
+                    countEl.textContent = Math.max(0, currentCount - 0.1).toFixed(1) + 'K';
+                    this.style.background = 'rgba(255, 107, 107, 0.2)';
+                } else {
                     icon.classList.remove('far');
-                    icon.classList.add('fas'); // Cambiar a corazón lleno
-                    countEl.textContent = (currentCount + 0.1).toFixed(1) + 'K'; // Incrementar
-                    this.style.background = 'rgba(255, 107, 107, 0.4)'; // Estilo 'like'
+                    icon.classList.add('fas');
+                    countEl.textContent = (currentCount + 0.1).toFixed(1) + 'K';
+                    this.style.background = 'rgba(255, 107, 107, 0.4)';
                 }
-                // Aquí podrías añadir una llamada a Supabase para actualizar el contador real en la DB
             });
         }
 
         // --- 8. FUNCIONALIDAD DE BÚSQUEDA ---
         searchInput.addEventListener('input', function(e) {
-            const searchTerm = e.target.value.toLowerCase().trim(); // Convertir a minúsculas y quitar espacios
+            const searchTerm = e.target.value.toLowerCase().trim();
             const allCards = movieGrid.querySelectorAll('.movie-card');
-            
+
             allCards.forEach(card => {
-                const title = card.getAttribute('data-title') || ''; // Obtener título (asegura que exista)
-                // Mostrar tarjeta si el título incluye el término de búsqueda, ocultar si no
-                card.style.display = title.includes(searchTerm) ? 'flex' : 'none'; 
+                const title = card.getAttribute('data-title') || '';
+                card.style.display = title.includes(searchTerm) ? 'flex' : 'none';
             });
         });
 
         // --- 9. CARGA INICIAL DE PELÍCULAS AL CARGAR LA PÁGINA ---
         document.addEventListener('DOMContentLoaded', () => {
-            loadMovies(); // Llama a la función para cargar las películas
+            loadMovies();
         });
 
     </script>
