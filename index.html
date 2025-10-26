@@ -379,6 +379,21 @@
             openModal('authModal');
         });
 
+        // =================================================================
+        // AQUÍ ESTÁ LA CORRECCIÓN: Faltaba este listener para ABRIR el modal
+        // =================================================================
+        document.getElementById('openUploadModal').addEventListener('click', () => {
+            // Opcional: puedes añadir un chequeo si solo el admin puede subir
+            // if (isAdmin) {
+            //     openModal('uploadModal');
+            // } else {
+            //     alert('Debes ser administrador para subir películas.');
+            // }
+            
+            // Por ahora, simplemente lo abre:
+            openModal('uploadModal');
+        });
+
         async function handleLogin(e) {
             e.preventDefault();
             const email = document.getElementById('modalEmail').value;
@@ -430,9 +445,7 @@
         uploadForm.addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            // =================================================================
-            // AQUÍ ESTÁ LA CORRECCIÓN: Esta línea define la variable
-            // =================================================================
+            // Esta es la corrección anterior, que ya tenías:
             const submitBtnText = submitUploadBtn.innerHTML;
 
             const videoFile = videoFileInput.files[0];
