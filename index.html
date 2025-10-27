@@ -99,19 +99,45 @@
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.2); border-radius: 4px; }
         ::-webkit-scrollbar-thumb { background: linear-gradient(45deg, #B8860B, #FFD700); border-radius: 4px; }
-        /* Responsive */
-        @media (max-width: 768px) { .header-content { flex-direction: column; gap: 15px; } .search-bar { max-width: 90%; width: 100%; order: 2; } .header-actions { width: 90%; justify-content: center; order: 3; gap: 25px; } .logo { order: 1; } .logo img#siteLogo { height: 80px; } .logo h1 { font-size: 2.5rem; } .movie-grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); } .movie-player { aspect-ratio: 16 / 9; } }
-        @media (max-width: 480px) { .logo { flex-direction: column; gap: 10px; text-align: center; } .logo i#defaultLogoIcon { font-size: 3rem; } .logo img#siteLogo { height: 70px; } .logo h1 { font-size: 2rem; } .movie-grid { grid-template-columns: 1fr; } .section-title { font-size: 1.6rem; } .modal-content { margin: 10% auto; padding: 20px;} .modal-title { font-size: 1.5rem; } .header-actions { flex-direction: row; } .icon-btn { width: 40px; height: 40px; font-size: 1rem; } }
+
+        /* --- CSS RESPONSIVO --- */
+        @media (max-width: 768px) {
+             .header-content { flex-direction: column; gap: 15px; }
+             .search-bar { max-width: 90%; width: 100%; order: 2; }
+             .header-actions { width: 90%; justify-content: center; order: 3; gap: 25px; }
+             .logo { order: 1; }
+             .logo img#siteLogo { height: 80px; }
+             .logo h1 { font-size: 2.5rem; }
+             /* Mantenemos varias columnas en tablet */
+             .movie-grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+             .movie-player { aspect-ratio: 16 / 9; }
+        }
+        @media (max-width: 480px) {
+            .logo { flex-direction: column; gap: 10px; text-align: center; }
+            .logo i#defaultLogoIcon { font-size: 3rem; }
+            .logo img#siteLogo { height: 70px; }
+            .logo h1 { font-size: 2rem; }
+            /* --- AJUSTE PARA DOS COLUMNAS EN MÓVIL --- */
+            .movie-grid {
+                grid-template-columns: repeat(2, 1fr); /* <<-- AQUÍ ESTÁ EL CAMBIO */
+                gap: 15px; /* Reducir espacio entre tarjetas */
+            }
+            .movie-card .movie-info { padding: 15px; } /* Menos padding en info */
+            .movie-card .movie-title { font-size: 1.1rem; } /* Título más pequeño */
+            .movie-card .movie-meta { font-size: 0.8rem; }
+            .movie-card .like-btn { padding: 6px 12px; font-size: 0.9rem; }
+            .movie-card .stat { font-size: 0.8rem; }
+            /* --- Fin del ajuste --- */
+            .section-title { font-size: 1.6rem; }
+            .modal-content { margin: 10% auto; padding: 20px;}
+            .modal-title { font-size: 1.5rem; }
+            .header-actions { flex-direction: row; }
+            .icon-btn { width: 40px; height: 40px; font-size: 1rem; }
+        }
     </style>
 </head>
 <body > <div class="container">
-        <header>
-            <div class="header-content">
-                <div class="logo"> <img src="" alt="Logo" id="siteLogo"> <i class="fas fa-film" id="defaultLogoIcon"></i> <h1>KLMZ PELIS</h1> </div>
-                <div class="search-bar"> <i class="fas fa-search"></i> <input type="text" id="searchInput" placeholder="Buscar película por título..."> </div>
-                <div class="header-actions"> <button class="icon-btn" id="openUploadModal" title="Subir Película"> <i class="fas fa-upload"></i> </button> <button class="icon-btn profile-btn" id="openAuthModal" title="Perfil / Login"> <i class="fas fa-user-circle"></i> </button> </div>
-            </div>
-        </header>
+        <header> <div class="header-content"> <div class="logo"> <img src="" alt="Logo" id="siteLogo"> <i class="fas fa-film" id="defaultLogoIcon"></i> <h1>KLMZ PELIS</h1> </div> <div class="search-bar"> <i class="fas fa-search"></i> <input type="text" id="searchInput" placeholder="Buscar película por título..."> </div> <div class="header-actions"> <button class="icon-btn" id="openUploadModal" title="Subir Película"> <i class="fas fa-upload"></i> </button> <button class="icon-btn profile-btn" id="openAuthModal" title="Perfil / Login"> <i class="fas fa-user-circle"></i> </button> </div> </div> </header>
         <div class="main-content"> <div class="movie-section"> <h2 class="section-title"> <i class="fas fa-video"></i> Películas Recientes </h2> <div class="movie-grid" id="movieGrid"> <p style="text-align: center; grid-column: 1 / -1;">Cargando películas...</p> </div> </div> </div>
         <footer> <p>© 2025 KLMZ PELIS - Todos los Derechos Reservados</p> <p class="developer-info">Desarrollado por Freddy Granados</p> </footer>
     </div>
@@ -121,23 +147,11 @@
 
     <script>
         // --- 1. CONFIGURACIÓN ---
-        const SUPABASE_URL = 'https://fcpczyohzcgulbfpthuc.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZjcGN6eW9oemNndWxiZnB0aHVjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE0MDA4NzksImV4cCI6MjA3Njk3Njg3OX0.Ya3sJ2Hb0gr8pCg5CEheMDWGjSCAuPeoNcfANUTuwPk';
-        const ADMIN_EMAIL = 'klmzr230@gmail.com'; // Asegúrate que este sea tu email admin real
-        const LOGO_BUCKET = 'assets';
-        const LOGO_FILE_PATH = 'public/site_logo.png';
-        const { createClient } = supabase;
-        const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const SUPABASE_URL = 'https://fcpczyohzcgulbfpthuc.supabase.co'; const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZjcGN6eW9oemNndWxiZnB0aHVjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE0MDA4NzksImV4cCI6MjA3Njk3Njg3OX0.Ya3sJ2Hb0gr8pCg5CEheMDWGjSCAuPeoNcfANUTuwPk'; const ADMIN_EMAIL = 'klmzr230@gmail.com'; const LOGO_BUCKET = 'assets'; const LOGO_FILE_PATH = 'public/site_logo.png'; const { createClient } = supabase; const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         // --- 2. REFERENCIAS GLOBALES ---
-        const authModal = document.getElementById('authModal'); const uploadModal = document.getElementById('uploadModal'); const editModal = document.getElementById('editModal'); const authContainer = document.getElementById('authContainer'); const movieGrid = document.getElementById('movieGrid'); const uploadForm = document.getElementById('uploadForm'); const editForm = document.getElementById('editForm'); const videoFileInput = document.getElementById('videoFile'); const coverFileInput = document.getElementById('coverFile'); const editCoverFileInput = document.getElementById('editCoverFile'); const fileLabelText = document.getElementById('fileLabelText'); const submitUploadBtn = document.getElementById('submitUploadBtn'); const uploadLoader = document.getElementById('uploadLoader'); const uploadError = document.getElementById('uploadError'); const coverPreview = document.getElementById('coverPreview'); const editCoverPreview = document.getElementById('editCoverPreview'); const saveChangesBtn = document.getElementById('saveChangesBtn'); const editLoader = document.getElementById('editLoader'); const editError = document.getElementById('editError'); const searchInput = document.getElementById('searchInput'); const modalAuthError = document.getElementById('modalAuthError'); const progressContainer = document.getElementById('progressContainer'); const progressLabel = document.getElementById('progressLabel'); const progressBarFill = document.getElementById('progressBarFill'); const progressText = document.getElementById('progressText'); const siteLogo = document.getElementById('siteLogo'); const defaultLogoIcon = document.getElementById('defaultLogoIcon');
-        let currentUser = null; let isAdmin = false;
+        const authModal = document.getElementById('authModal'); const uploadModal = document.getElementById('uploadModal'); const editModal = document.getElementById('editModal'); const authContainer = document.getElementById('authContainer'); const movieGrid = document.getElementById('movieGrid'); const uploadForm = document.getElementById('uploadForm'); const editForm = document.getElementById('editForm'); const videoFileInput = document.getElementById('videoFile'); const coverFileInput = document.getElementById('coverFile'); const editCoverFileInput = document.getElementById('editCoverFile'); const fileLabelText = document.getElementById('fileLabelText'); const submitUploadBtn = document.getElementById('submitUploadBtn'); const uploadLoader = document.getElementById('uploadLoader'); const uploadError = document.getElementById('uploadError'); const coverPreview = document.getElementById('coverPreview'); const editCoverPreview = document.getElementById('editCoverPreview'); const saveChangesBtn = document.getElementById('saveChangesBtn'); const editLoader = document.getElementById('editLoader'); const editError = document.getElementById('editError'); const searchInput = document.getElementById('searchInput'); const modalAuthError = document.getElementById('modalAuthError'); const progressContainer = document.getElementById('progressContainer'); const progressLabel = document.getElementById('progressLabel'); const progressBarFill = document.getElementById('progressBarFill'); const progressText = document.getElementById('progressText'); const siteLogo = document.getElementById('siteLogo'); const defaultLogoIcon = document.getElementById('defaultLogoIcon'); let currentUser = null; let isAdmin = false;
         // --- 3. FUNCIONES UTILITARIAS ---
-        function openModal(modalId) { document.getElementById(modalId).style.display = 'block'; }
-        function closeModal(modalId) { document.getElementById(modalId).style.display = 'none'; }
-        function showLoader(loaderElement) { loaderElement.style.display = 'inline-block'; }
-        function hideLoader(loaderElement) { loaderElement.style.display = 'none'; }
-        function showError(errorElement, message) { errorElement.textContent = message; errorElement.style.display = 'block'; }
-        function hideError(errorElement) { errorElement.style.display = 'none'; }
+        function openModal(modalId) { document.getElementById(modalId).style.display = 'block'; } function closeModal(modalId) { document.getElementById(modalId).style.display = 'none'; } function showLoader(loaderElement) { loaderElement.style.display = 'inline-block'; } function hideLoader(loaderElement) { loaderElement.style.display = 'none'; } function showError(errorElement, message) { errorElement.textContent = message; errorElement.style.display = 'block'; } function hideError(errorElement) { errorElement.style.display = 'none'; }
         // --- 4. LÓGICA DE AUTENTICACIÓN Y LOGO ---
         async function loadLogo() { const { data } = supabaseClient.storage.from(LOGO_BUCKET).getPublicUrl(LOGO_FILE_PATH); if (data && data.publicUrl) { const logoUrlWithCacheBust = `${data.publicUrl}?t=${new Date().getTime()}`; const img = new Image(); img.onload = () => { siteLogo.src = logoUrlWithCacheBust; siteLogo.style.display = 'block'; defaultLogoIcon.style.display = 'none'; }; img.onerror = () => { siteLogo.style.display = 'none'; defaultLogoIcon.style.display = 'block'; }; img.src = logoUrlWithCacheBust; } else { siteLogo.style.display = 'none'; defaultLogoIcon.style.display = 'block'; } }
         async function checkSession() { try { const { data: { session }, error } = await supabaseClient.auth.getSession(); if (error) throw error; currentUser = session?.user ?? null; isAdmin = currentUser?.email === ADMIN_EMAIL; } catch (error) { console.error("Error checking session:", error); currentUser = null; isAdmin = false; } finally { updateUIBasedOnAuth(); loadMovies(); loadLogo(); } }
@@ -148,82 +162,11 @@
         document.getElementById('openUploadModal').addEventListener('click', () => { openModal('uploadModal'); });
         async function handleLogin(e) { e.preventDefault(); const email = document.getElementById('modalEmail').value; const password = document.getElementById('modalPassword').value; const loginBtn = document.getElementById('modalLoginBtn'); const loader = document.getElementById('authLoader'); hideError(modalAuthError); showLoader(loader); loginBtn.disabled = true; try { const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password }); if (error) throw error; if (data?.user) { currentUser = data.user; isAdmin = currentUser.email === ADMIN_EMAIL; updateUIBasedOnAuth(); closeModal('authModal'); loadMovies(); loadLogo(); alert(`¡Bienvenido ${isAdmin ? 'Admin' : ''}!`); } else { throw new Error("No se recibieron datos de usuario."); } } catch (error) { showError(modalAuthError, `Error: ${error.message}`); console.error("Login error:", error); } finally { hideLoader(loader); if(loginBtn) loginBtn.disabled = false; } }
         async function handleLogout() { const { error } = await supabaseClient.auth.signOut(); if (error) { alert(`Error al cerrar sesión: ${error.message}`); } else { currentUser = null; isAdmin = false; updateUIBasedOnAuth(); closeModal('authModal'); loadMovies(); loadLogo(); alert('Sesión cerrada.'); } }
-
         // --- 5. LÓGICA DE SUBIDA (DIRECTO A R2, SIN CHECK ADMIN, SIN REFRESH) ---
-        uploadForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-             // === VERIFICACIÓN INICIAL (SOLO SI HAY USUARIO) ===
-            const { data: { user } } = await supabaseClient.auth.getUser();
-            if (!user) {
-                showError(uploadError, 'Error: Debes iniciar sesión para subir una película.');
-                // Opcional: Abrir modal de login si quieres
-                // renderAuthUI();
-                // openModal('authModal');
-                return; // Detiene si no hay nadie logueado
-            }
-            // ================================================
-
-            const submitBtnText = submitUploadBtn.innerHTML;
-            const videoFile = videoFileInput.files[0]; const coverFile = coverFileInput.files[0];
-            const title = document.getElementById('movieTitle').value; const year = document.getElementById('movieYear').value; const genre = document.getElementById('movieGenre').value; const description = document.getElementById('movieDescription').value;
-            if (!videoFile) { showError(uploadError, 'Selecciona un archivo de video.'); return; }
-            hideError(uploadError); submitUploadBtn.disabled = true; hideLoader(uploadLoader);
-            progressContainer.style.display = 'none'; progressBarFill.style.width = '0%'; progressText.textContent = '0%';
-            let coverPublicUrl = null; let videoPublicUrl = null;
-            try {
-                // Subida Portada
-                if (coverFile) {
-                    submitUploadBtn.firstElementChild.className = 'fas fa-image'; submitUploadBtn.lastChild.textContent = ' Subiendo Portada...';
-                    const { presignedUrl, publicUrl } = await getUploadUrl('get-image-presigned-url', coverFile);
-                    await uploadFileWithProgress(presignedUrl, coverFile, () => {}); coverPublicUrl = publicUrl;
-                }
-                // Obtener URL Video
-                submitUploadBtn.firstElementChild.className = 'fas fa-lock'; submitUploadBtn.lastChild.textContent = ' Autorizando Video...';
-                const { presignedUrl: videoPresignedUrl, publicUrl: vidPublicUrl } = await getUploadUrl('get-presigned-url', videoFile);
-                videoPublicUrl = vidPublicUrl;
-                // Subida Video
-                submitUploadBtn.firstElementChild.className = 'fas fa-spinner fa-spin'; submitUploadBtn.lastChild.textContent = ' Subiendo Video...';
-                progressContainer.style.display = 'block'; progressLabel.textContent = `Subiendo: ${videoFile.name}`;
-                const onVideoProgress = (percent, loaded, total) => { const loadedMB = (loaded / 1024 / 1024).toFixed(1); const totalMB = (total / 1024 / 1024).toFixed(1); progressBarFill.style.width = `${percent.toFixed(2)}%`; progressText.textContent = `${percent.toFixed(0)}% (${loadedMB} MB / ${totalMB} MB)`; };
-                await uploadFileWithProgress(videoPresignedUrl, videoFile, onVideoProgress); // <-- La subida a R2 termina aquí
-
-                // --- Guardar en DB (Permitido por RLS para 'authenticated') ---
-                submitUploadBtn.firstElementChild.className = 'fas fa-database'; submitUploadBtn.lastChild.textContent = ' Guardando datos...';
-                const { data: movieData, error: dbError } = await supabaseClient
-                    .from('movies')
-                    .insert({ title, year: parseInt(year), genre, description, video_url: videoPublicUrl, cover_url: coverPublicUrl })
-                    .select().single(); // La política RLS ahora permite esto
-
-                if (dbError) {
-                    console.error("Error al insertar en DB:", dbError); // Loguear el error específico
-                    throw new Error(`Error al guardar en base de datos: ${dbError.message}`);
-                 }
-                if (!movieData) throw new Error("No se recibieron datos al guardar.");
-
-                // --- Éxito ---
-                alert('¡Película subida! 🎉');
-                closeModal('uploadModal'); uploadForm.reset(); fileLabelText.textContent = 'Selecciona tu archivo de video (.mp4)'; coverPreview.style.display = 'none';
-                addMovieCardToGrid(movieData);
-
-            } catch (error) {
-                console.error('Error en subida:', error);
-                showError(uploadError, `Error: ${error.message}`);
-                 // Si el error es sobre RLS, da un mensaje más claro
-                 if (error.message.includes('security policy')) {
-                     showError(uploadError, `Error: Permiso denegado por la base de datos. Asegúrate de estar logueado.`);
-                 }
-            } finally {
-                submitUploadBtn.disabled = false; submitUploadBtn.innerHTML = submitBtnText;
-                progressContainer.style.display = 'none'; progressBarFill.style.width = '0%'; progressText.textContent = '0%';
-            }
-        });
-
-        // Funciones auxiliares (getUploadUrl, uploadFileWithProgress)
+        uploadForm.addEventListener('submit', async (e) => { e.preventDefault(); const { data: { user } } = await supabaseClient.auth.getUser(); if (!user) { showError(uploadError, 'Error: Debes iniciar sesión para subir una película.'); return; } const submitBtnText = submitUploadBtn.innerHTML; const videoFile = videoFileInput.files[0]; const coverFile = coverFileInput.files[0]; const title = document.getElementById('movieTitle').value; const year = document.getElementById('movieYear').value; const genre = document.getElementById('movieGenre').value; const description = document.getElementById('movieDescription').value; if (!videoFile) { showError(uploadError, 'Selecciona un archivo de video.'); return; } hideError(uploadError); submitUploadBtn.disabled = true; hideLoader(uploadLoader); progressContainer.style.display = 'none'; progressBarFill.style.width = '0%'; progressText.textContent = '0%'; let coverPublicUrl = null; let videoPublicUrl = null; try { if (coverFile) { submitUploadBtn.firstElementChild.className = 'fas fa-image'; submitUploadBtn.lastChild.textContent = ' Subiendo Portada...'; const { presignedUrl, publicUrl } = await getUploadUrl('get-image-presigned-url', coverFile); await uploadFileWithProgress(presignedUrl, coverFile, () => {}); coverPublicUrl = publicUrl; } submitUploadBtn.firstElementChild.className = 'fas fa-lock'; submitUploadBtn.lastChild.textContent = ' Autorizando Video...'; const { presignedUrl: videoPresignedUrl, publicUrl: vidPublicUrl } = await getUploadUrl('get-presigned-url', videoFile); videoPublicUrl = vidPublicUrl; submitUploadBtn.firstElementChild.className = 'fas fa-spinner fa-spin'; submitUploadBtn.lastChild.textContent = ' Subiendo Video...'; progressContainer.style.display = 'block'; progressLabel.textContent = `Subiendo: ${videoFile.name}`; const onVideoProgress = (percent, loaded, total) => { const loadedMB = (loaded / 1024 / 1024).toFixed(1); const totalMB = (total / 1024 / 1024).toFixed(1); progressBarFill.style.width = `${percent.toFixed(2)}%`; progressText.textContent = `${percent.toFixed(0)}% (${loadedMB} MB / ${totalMB} MB)`; }; await uploadFileWithProgress(videoPresignedUrl, videoFile, onVideoProgress); submitUploadBtn.firstElementChild.className = 'fas fa-database'; submitUploadBtn.lastChild.textContent = ' Guardando datos...'; const { data: movieData, error: dbError } = await supabaseClient.from('movies').insert({ title, year: parseInt(year), genre, description, video_url: videoPublicUrl, cover_url: coverPublicUrl }).select().single(); if (dbError) { console.error("Error al insertar en DB:", dbError); throw new Error(`Error al guardar en base de datos: ${dbError.message}`); } if (!movieData) throw new Error("No se recibieron datos al guardar."); alert('¡Película subida! 🎉'); closeModal('uploadModal'); uploadForm.reset(); fileLabelText.textContent = 'Selecciona tu archivo de video (.mp4)'; coverPreview.style.display = 'none'; addMovieCardToGrid(movieData); } catch (error) { console.error('Error en subida:', error); showError(uploadError, `Error: ${error.message}`); if (error.message.includes('security policy')) { showError(uploadError, `Error: Permiso denegado por la base de datos. Asegúrate de estar logueado.`); } } finally { submitUploadBtn.disabled = false; submitUploadBtn.innerHTML = submitBtnText; progressContainer.style.display = 'none'; progressBarFill.style.width = '0%'; progressText.textContent = '0%'; } });
         async function getUploadUrl(functionName, file) { const { data, error } = await supabaseClient.functions.invoke(functionName, { body: JSON.stringify({ fileName: file.name, contentType: file.type || 'application/octet-stream' }) }); if (error) throw error; if (data.error) throw new Error(`Error en ${functionName}: ${data.error}`); if (!data.presignedUrl || !data.publicUrl) throw new Error(`Respuesta inválida de ${functionName}.`); return { presignedUrl: data.presignedUrl, publicUrl: data.publicUrl }; }
         function uploadFileWithProgress(presignedUrl, file, onProgress) { return new Promise((resolve, reject) => { const xhr = new XMLHttpRequest(); xhr.open('PUT', presignedUrl); xhr.setRequestHeader('Content-Type', file.type || 'application/octet-stream'); xhr.upload.onprogress = (event) => { if (event.lengthComputable) { const percent = (event.loaded / event.total) * 100; onProgress(percent, event.loaded, event.total); } }; xhr.onload = () => { if (xhr.status >= 200 && xhr.status < 300) { resolve(xhr.response); } else { const match = xhr.responseText.match(/<Message>(.*?)<\/Message>/); const r2Message = match ? match[1] : `Status ${xhr.status}`; reject(new Error(`Falló subida a R2 (${file.name}): ${r2Message}.`)); } }; xhr.onerror = () => { reject(new Error('Error de red durante la subida.')); }; xhr.send(file); }); }
         coverFileInput.addEventListener('change', (e) => { const file = e.target.files[0]; if (file) { const reader = new FileReader(); reader.onload = (event) => { coverPreview.src = event.target.result; coverPreview.style.display = 'block'; }; reader.readAsDataURL(file); } else { coverPreview.style.display = 'none'; coverPreview.src = ''; } });
-
         // --- 6. CARGAR PELÍCULAS ---
         async function loadMovies() { movieGrid.innerHTML = '<p style="text-align: center; grid-column: 1 / -1;">Cargando películas...</p>'; try { const { data: movies, error } = await supabaseClient.from('movies').select('*').order('created_at', { ascending: false }); movieGrid.innerHTML = ''; if (error) throw error; if (movies.length === 0) { movieGrid.innerHTML = '<p style="text-align: center; grid-column: 1 / -1;">Aún no hay películas. ¡Sube la primera! 🚀</p>'; } else { movies.forEach(addMovieCardToGrid); } } catch (error) { console.error('Error al cargar películas:', error); movieGrid.innerHTML = `<p style="color: #FF6347; text-align: center; grid-column: 1 / -1;">Error al cargar: ${error.message} 😥</p>`; } }
         function addMovieCardToGrid(movie) { if (!movie?.id || !movie.title || !movie.video_url) { console.warn("Datos inválidos para tarjeta:", movie); return; } const card = document.createElement('div'); card.className = 'movie-card'; card.setAttribute('data-movie-id', movie.id); card.setAttribute('data-title', movie.title.toLowerCase()); const likes = ((movie.likes || 0) / 1000).toFixed(1) + 'K'; const views = ((movie.views || 0) / 1000).toFixed(1) + 'K'; const coverImage = movie.cover_url ? `<img src="${movie.cover_url}" alt="Portada" class="movie-cover">` : ''; card.innerHTML = ` <div class="movie-player"> ${coverImage} <video controls preload="metadata"> <source src="${movie.video_url}" type="video/mp4">Tu navegador no soporta video. </video> <button class="play-button"><i class="fas fa-play"></i></button> <div class="admin-actions"> <button class="btn-edit-admin" title="Editar"><i class="fas fa-pencil-alt"></i></button> <button class="btn-delete-admin" title="Eliminar (solo DB)"><i class="fas fa-trash-alt"></i></button> </div> </div> <div class="movie-info"> <h3 class="movie-title">${movie.title}</h3> <div class="movie-meta"> <span>${movie.year || '-'} • ${movie.genre || '-'}</span> <span>⭐ --</span> </div> <div class="movie-actions"> <button class="like-btn"> <i class="far fa-heart"></i> <span>${likes}</span> </button> <div class="movie-stats"> <span class="stat"><i class="fas fa-eye"></i> ${views}</span> </div> </div> </div> `; addCardListeners(card, movie); movieGrid.appendChild(card); }
