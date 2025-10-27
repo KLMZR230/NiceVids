@@ -37,9 +37,9 @@
         .movie-card { background: rgba(10, 10, 10, 0.7); border-radius: 15px; overflow: hidden; transition: all 0.3s ease; border: 1px solid rgba(255, 215, 0, 0.15); display: flex; flex-direction: column; position: relative; }
         .movie-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5); border-color: rgba(255, 215, 0, 0.4); }
         .movie-player { width: 100%; aspect-ratio: 16 / 9; background: #000; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.2rem; font-weight: 600; text-align: center; position: relative; overflow: hidden; }
-        .movie-cover { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; z-index: 1; transition: opacity 0.3s ease; }
-        .movie-player video { width: 100%; height: 100%; object-fit: cover; display: none; background-color: #000; z-index: 0; position: relative; }
-        .play-button { background: rgba(255, 215, 0, 0.8); border: none; color: #1a1a1a; width: 60px; height: 60px; border-radius: 50%; font-size: 1.5rem; cursor: pointer; transition: all 0.3s ease; z-index: 2; position: absolute; }
+        .movie-cover { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; z-index: 1; /* Cover encima del video por defecto */ transition: opacity 0.3s ease; }
+        .movie-player video { width: 100%; height: 100%; object-fit: cover; display: none; background-color: #000; z-index: 0; /* Video detrás de la portada y botón play */ position: relative; }
+        .play-button { background: rgba(255, 215, 0, 0.8); border: none; color: #1a1a1a; width: 60px; height: 60px; border-radius: 50%; font-size: 1.5rem; cursor: pointer; transition: all 0.3s ease; z-index: 2; /* Botón play encima del video y la portada */ position: absolute; }
         .play-button:hover { background: rgba(255, 215, 0, 1); transform: scale(1.1); }
         .movie-info { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; }
         .movie-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 10px; color: #f0f0f0; flex-grow: 1; word-break: break-word; overflow-wrap: break-word; }
@@ -51,7 +51,7 @@
         .stat { display: flex; align-items: center; gap: 5px; color: #aaa; font-size: 0.9rem; }
         .stat i { color: #FFD700; }
         /* Admin Actions (Card) */
-        .admin-actions { position: absolute; top: 10px; right: 10px; z-index: 3; display: none; gap: 8px; background: rgba(0,0,0,0.7); padding: 8px; border-radius: 5px; }
+        .admin-actions { position: absolute; top: 10px; right: 10px; z-index: 3; /* Encima de todo */ display: none; gap: 8px; background: rgba(0,0,0,0.7); padding: 8px; border-radius: 5px; }
         .admin-actions button { background: none; border: none; color: white; cursor: pointer; font-size: 1rem; padding: 5px; line-height: 1; transition: color 0.2s ease; }
         .admin-actions button:hover { color: #FFD700; }
         .btn-delete-admin:hover { color: #dc3545; }
@@ -112,56 +112,37 @@
              .movie-player { aspect-ratio: 16 / 9; }
         }
         @media (max-width: 480px) {
-            .logo { flex-direction: column; gap: 10px; text-align: center; }
-            .logo i#defaultLogoIcon { font-size: 3rem; }
-            .logo img#siteLogo { height: 70px; }
-            .logo h1 { font-size: 2rem; }
+            /* --- AJUSTE LOGO ALINEADO IZQUIERDA (MÓVIL) --- */
+            .logo {
+                flex-direction: row; /* Volver a fila */
+                text-align: left; /* Alinear texto a la izquierda */
+                /* Ya no necesitamos gap: 10px; text-align: center; */
+            }
+            .logo i#defaultLogoIcon { font-size: 2.5rem; /* Tamaño más consistente */ }
+            .logo img#siteLogo { height: 50px; /* Tamaño móvil más balanceado */ }
+            .logo h1 { font-size: 1.8rem; /* Reducir un poco el texto */ }
+             /* Ajuste para que el header no se desborde si el logo+texto es ancho */
+             .header-content {
+                 padding-left: 15px; /* Añadir padding para evitar que logo pegue al borde */
+                 padding-right: 15px;
+             }
+             /* --- Fin Ajuste Logo --- */
 
             /* --- AJUSTE PARA DOS COLUMNAS (TEXTO MÁS PEQUEÑO, IMAGEN DESTACADA) --- */
             .movie-grid {
                 grid-template-columns: repeat(2, 1fr);
-                gap: 15px; /* Reducimos el espacio entre tarjetas */
+                gap: 15px;
             }
-            .movie-card .movie-player {
-                 font-size: 1rem; /* Reduce texto 'cargando' si aplica */
-            }
-            .movie-card .play-button {
-                 width: 45px; /* Botón play más pequeño */
-                 height: 45px;
-                 font-size: 1.2rem;
-            }
-            .movie-card .movie-info {
-                 padding: 10px; /* <<-- MENOS PADDING para dar más espacio visual a imagen */
-            }
-            .movie-card .movie-title {
-                 font-size: 0.9rem; /* <<-- TEXTO MÁS PEQUEÑO */
-                 margin-bottom: 5px; /* Menos espacio */
-                 line-height: 1.2;
-            }
-            .movie-card .movie-meta {
-                 font-size: 0.75rem; /* <<-- TEXTO MÁS PEQUEÑO */
-                 margin-bottom: 8px;
-                 gap: 5px; /* Menos espacio entre año/género/estrellas */
-            }
-             .movie-actions {
-                 margin-top: 8px; /* Menos espacio arriba */
-                 gap: 8px;
-             }
-            .movie-card .like-btn {
-                 padding: 5px 10px; /* <<-- Botón más pequeño */
-                 font-size: 0.75rem; /* <<-- TEXTO MÁS PEQUEÑO */
-                 gap: 4px;
-            }
-             .movie-card .like-btn i {
-                 font-size: 0.8em; /* Icono corazón más pequeño */
-             }
-            .movie-card .stat {
-                 font-size: 0.75rem; /* <<-- TEXTO MÁS PEQUEÑO */
-                 gap: 3px;
-            }
-            .movie-card .stat i {
-                 font-size: 0.8em; /* Icono ojo más pequeño */
-            }
+            .movie-card .movie-player { font-size: 1rem; }
+            .movie-card .play-button { width: 45px; height: 45px; font-size: 1.2rem; }
+            .movie-card .movie-info { padding: 8px; /* <<-- MENOS PADDING AÚN */ }
+            .movie-card .movie-title { font-size: 0.85rem; /* <<-- TEXTO MÁS PEQUEÑO */ margin-bottom: 4px; line-height: 1.2; }
+            .movie-card .movie-meta { font-size: 0.7rem; /* <<-- TEXTO MÁS PEQUEÑO */ margin-bottom: 6px; gap: 4px; }
+            .movie-actions { margin-top: 6px; gap: 6px; flex-wrap: wrap; /* Permitir que botones se envuelvan si no caben */ justify-content: space-between; /* Mejor distribución */ }
+            .movie-card .like-btn { padding: 4px 8px; /* <<-- Botón más pequeño */ font-size: 0.7rem; /* <<-- TEXTO MÁS PEQUEÑO */ gap: 3px; }
+            .movie-card .like-btn i { font-size: 0.8em; }
+            .movie-card .stat { font-size: 0.7rem; /* <<-- TEXTO MÁS PEQUEÑO */ gap: 3px; }
+            .movie-card .stat i { font-size: 0.8em; }
             /* --- Fin del ajuste --- */
 
             .section-title { font-size: 1.6rem; }
