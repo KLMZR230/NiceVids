@@ -8,22 +8,36 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
-        /* --- ESTILOS CSS COMPLETOS (Añadimos estilos para admin) --- */
+        /* --- ESTILOS CSS COMPLETOS --- */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); color: #fff; min-height: 100vh; }
         .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
         header { background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(10px); padding: 20px 0; margin-bottom: 30px; border-bottom: 2px solid #ff6b6b; }
         .header-content { display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; }
+        
+        /* --- 1. CSS DEL LOGO MODIFICADO --- */
         .logo { display: flex; align-items: center; gap: 15px; }
-        .logo i { font-size: 2.5rem; color: #ff6b6b; }
+        .logo i#defaultLogoIcon { 
+            font-size: 2.5rem; 
+            color: #ff6b6b; 
+            display: block; /* Visible por defecto */
+        }
+        .logo img#siteLogo { 
+            height: 40px; /* Altura fija para tu logo */
+            width: auto; 
+            max-width: 150px; /* Evita que sea demasiado ancho */
+            border-radius: 8px; 
+            display: none; /* Oculto por defecto */
+        }
         .logo h1 { font-size: 2.2rem; font-weight: 700; background: linear-gradient(45deg, #ff6b6b, #4ecdc4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
         .search-bar { position: relative; flex-grow: 1; max-width: 500px; min-width: 200px; }
         .search-bar i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #aaa; }
         .search-bar input { width: 100%; padding: 12px 12px 12px 40px; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 50px; color: white; font-size: 1rem; outline: none; transition: all 0.3s ease; }
         .search-bar input:focus { border-color: #ff6b6b; box-shadow: 0 0 15px rgba(255, 107, 107, 0.3); }
-        .header-actions { display: flex; align-items: center; gap: 15px; } /* Contenedor para botones */
-        .upload-btn, .profile-btn { background: linear-gradient(45deg, #ff6b6b, #ff8e8e); color: white; border: none; padding: 12px 20px; /* Ajustado */ font-size: 1.1rem; font-weight: 600; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; gap: 10px; flex-shrink: 0; white-space: nowrap; }
-        .profile-btn { background: linear-gradient(45deg, #4ecdc4, #6aede1); padding: 12px 15px; } /* Botón perfil */
+        .header-actions { display: flex; align-items: center; gap: 15px; } 
+        .upload-btn, .profile-btn { background: linear-gradient(45deg, #ff6b6b, #ff8e8e); color: white; border: none; padding: 12px 20px; font-size: 1.1rem; font-weight: 600; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; gap: 10px; flex-shrink: 0; white-space: nowrap; }
+        .profile-btn { background: linear-gradient(45deg, #4ecdc4, #6aede1); padding: 12px 15px; } 
         .upload-btn:hover, .profile-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(255, 107, 107, 0.4); }
         .profile-btn:hover { box-shadow: 0 10px 25px rgba(78, 205, 196, 0.4); }
 
@@ -32,7 +46,7 @@
         .movie-section { background: rgba(255, 255, 255, 0.08); border-radius: 20px; padding: 30px; backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
         .section-title { font-size: 2rem; margin-bottom: 25px; color: #4ecdc4; display: flex; align-items: center; gap: 10px; }
         .movie-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px; }
-        .movie-card { background: rgba(0, 0, 0, 0.4); border-radius: 15px; overflow: hidden; transition: all 0.3s ease; border: 1px solid rgba(255, 255, 255, 0.1); display: flex; flex-direction: column; position: relative; /* Para botones admin */ }
+        .movie-card { background: rgba(0, 0, 0, 0.4); border-radius: 15px; overflow: hidden; transition: all 0.3s ease; border: 1px solid rgba(255, 255, 255, 0.1); display: flex; flex-direction: column; position: relative; }
         .movie-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3); border-color: rgba(255, 107, 107, 0.3); }
         .movie-player { width: 100%; aspect-ratio: 16 / 9; background: #000; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.2rem; font-weight: 600; text-align: center; position: relative; overflow: hidden; }
         .movie-cover { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; z-index: 1; transition: opacity 0.3s ease; }
@@ -54,9 +68,9 @@
             position: absolute;
             top: 10px;
             right: 10px;
-            z-index: 3; /* Encima de la portada y el botón play */
-            display: none; /* Oculto por defecto */
-            gap: 8px; /* Espacio entre botones */
+            z-index: 3; 
+            display: none; 
+            gap: 8px; 
             background: rgba(0,0,0,0.7);
             padding: 8px;
             border-radius: 5px;
@@ -66,26 +80,25 @@
             border: none;
             color: white;
             cursor: pointer;
-            font-size: 1rem; /* Tamaño del icono */
+            font-size: 1rem; 
             padding: 5px;
             line-height: 1;
             transition: color 0.2s ease;
         }
-        .admin-actions button:hover { color: #ffc107; /* Amarillo al pasar por encima */ }
-        .btn-delete-admin:hover { color: #dc3545; /* Rojo al pasar por encima */ }
-        /* Mostrar botones si el body tiene la clase 'admin-mode' */
+        .admin-actions button:hover { color: #ffc107; }
+        .btn-delete-admin:hover { color: #dc3545; }
         body.admin-mode .admin-actions { display: flex; }
 
-        /* Estilos Modales (Upload, Auth, Edit - Reutilizados) */
+        /* Estilos Modales */
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.8); backdrop-filter: blur(5px); padding: 20px; }
         .modal-content { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); margin: 5% auto; padding: 30px; width: 95%; max-width: 600px; border-radius: 20px; border: 1px solid rgba(255, 107, 107, 0.3); position: relative;}
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-right: 40px; /* Espacio para botón cerrar */ }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-right: 40px; }
         .modal-title { font-size: 1.8rem; color: #ff6b6b; }
         .close-modal { background: none; border: none; color: white; font-size: 1.8rem; cursor: pointer; padding: 5px; line-height: 1; position: absolute; top: 15px; right: 20px; }
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #4ecdc4; }
         .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 12px; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 10px; color: white; font-size: 1rem; box-sizing: border-box;}
-        .form-group input:-webkit-autofill { /* Arreglo para autofill oscuro */ -webkit-box-shadow: 0 0 0 30px #16213e inset !important; -webkit-text-fill-color: white !important; }
+        .form-group input:-webkit-autofill { -webkit-box-shadow: 0 0 0 30px #16213e inset !important; -webkit-text-fill-color: white !important; }
         .form-group textarea { resize: vertical; min-height: 100px; }
         .form-group img { max-width: 150px; max-height: 150px; display: block; margin-top: 10px; border-radius: 5px; border: 1px solid #444;}
         .file-input-container { position: relative; border: 2px dashed rgba(255, 107, 107, 0.3); border-radius: 10px; padding: 30px; text-align: center; cursor: pointer; transition: all 0.3s ease; }
@@ -94,7 +107,7 @@
         .file-label { display: flex; flex-direction: column; align-items: center; gap: 10px; pointer-events: none; }
         .file-label i { font-size: 2.5rem; color: #ff6b6b; }
         .file-label span { word-break: break-all; }
-        .submit-btn, .action-btn { background: linear-gradient(45deg, #ff6b6b, #ff8e8e); color: white; border: none; padding: 15px; border-radius: 10px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; /* Ocupar ancho completo en modales */ }
+        .submit-btn, .action-btn { background: linear-gradient(45deg, #ff6b6b, #ff8e8e); color: white; border: none; padding: 15px; border-radius: 10px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; }
         .action-btn { background: linear-gradient(45deg, #4ecdc4, #6aede1); font-size: 1rem; padding: 12px 20px; }
         .submit-btn:disabled, .action-btn:disabled { background: #aaa; cursor: not-allowed; opacity: 0.7; transform: none; box-shadow: none; }
         .submit-btn:hover:not(:disabled), .action-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(255, 107, 107, 0.4); }
@@ -103,7 +116,7 @@
         .loader { border: 4px solid rgba(255,255,255,0.3); border-top: 4px solid #fff; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; margin-left: 10px; vertical-align: middle; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* --- CSS PARA BARRA DE PROGRESO --- */
+        /* CSS PARA BARRA DE PROGRESO */
         .progress-bar-background {
             width: 100%;
             background: rgba(0, 0, 0, 0.3);
@@ -114,13 +127,13 @@
             margin-top: 5px;
         }
         .progress-bar-fill {
-            width: 0%; /* Inicia en 0 */
+            width: 0%; 
             height: 100%;
             background: linear-gradient(45deg, #4ecdc4, #6aede1);
-            transition: width 0.2s ease-out; /* Suaviza el movimiento */
+            transition: width 0.2s ease-out; 
         }
         #progressContainer {
-            display: none; /* Oculto por defecto */
+            display: none; 
             margin-bottom: 15px;
         }
         #progressText {
@@ -138,22 +151,35 @@
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.2); border-radius: 4px; }
         ::-webkit-scrollbar-thumb { background: linear-gradient(45deg, #ff6b6b, #4ecdc4); border-radius: 4px; }
-        /* Responsive */
+        
+        /* --- 2. CSS RESPONSIVO (Tu código ya era bueno, solo ajusté el logo) --- */
         @media (max-width: 768px) {
             .header-content { flex-direction: column; gap: 15px; }
             .search-bar { max-width: 90%; width: 100%; order: 2; }
-            .header-actions { width: 90%; justify-content: space-around; /* Mejor espacio */ order: 3; }
+            .header-actions { width: 90%; justify-content: space-around; order: 3; }
             .logo { order: 1; }
             .movie-grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
             .movie-player { aspect-ratio: 16 / 9; }
         }
         @media (max-width: 480px) {
-            .logo h1 { font-size: 1.8rem; }
-            .movie-grid { grid-template-columns: 1fr; }
+            .logo { 
+                flex-direction: column; /* Apila el logo y el texto */
+                gap: 5px; 
+                text-align: center; 
+            }
+            .logo i#defaultLogoIcon { 
+                font-size: 2rem; /* Reduce el icono por defecto */
+            }
+            .logo img#siteLogo { 
+                height: 35px; /* Reduce el logo subido */
+            }
+            .logo h1 { font-size: 1.8rem; } /* El texto ya se achicaba, bien */
+            
+            .movie-grid { grid-template-columns: 1fr; } /* Columna única para películas */
             .section-title { font-size: 1.6rem; }
             .modal-content { margin: 10% auto; padding: 20px;}
             .modal-title { font-size: 1.5rem; }
-            .header-actions { flex-direction: column; gap: 10px; align-items: center; }
+            .header-actions { flex-direction: column; gap: 10px; align-items: center; } /* Botones apilados */
             .upload-btn, .profile-btn { width: 80%; justify-content: center;}
         }
 
@@ -163,9 +189,11 @@
         <header>
             <div class="header-content">
                 <div class="logo">
-                    <i class="fas fa-film"></i>
+                    <img src="" alt="Logo" id="siteLogo">
+                    <i class="fas fa-film" id="defaultLogoIcon"></i>
                     <h1>KLMZ PELIS</h1>
                 </div>
+
                 <div class="search-bar">
                     <i class="fas fa-search"></i>
                     <input type="text" id="searchInput" placeholder="Buscar película por título...">
@@ -250,6 +278,7 @@
                     </div>
                     <span id="progressText">0%</span>
                 </div>
+                
                 <button type="submit" class="submit-btn" id="submitUploadBtn">
                     <i class="fas fa-upload"></i> Subir Película
                     <span id="uploadLoader" class="loader" style="display: none;"></span>
@@ -317,6 +346,8 @@
         const SUPABASE_URL = 'https://fcpczyohzcgulbfpthuc.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZjcGN6eW9oemNndWxiZnB0aHVjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE0MDA4NzksImV4cCI6MjA3Njk3Njg3OX0.Ya3sJ2Hb0gr8pCg5CEheMDWGjSCAuPeoNcfANUTuwPk';
         const ADMIN_EMAIL = 'klmzr230@gmail.com';
+        const LOGO_BUCKET = 'assets'; // El nombre del bucket que creaste
+        const LOGO_FILE_PATH = 'public/site_logo.png'; // Ruta fija para el logo
 
         const { createClient } = supabase;
         const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -344,12 +375,16 @@
         const editError = document.getElementById('editError');
         const searchInput = document.getElementById('searchInput');
         const modalAuthError = document.getElementById('modalAuthError');
-
-        // **NUEVAS REFERENCIAS PARA LA BARRA DE PROGRESO**
+        
+        // Referencias para la barra de progreso
         const progressContainer = document.getElementById('progressContainer');
         const progressLabel = document.getElementById('progressLabel');
         const progressBarFill = document.getElementById('progressBarFill');
         const progressText = document.getElementById('progressText');
+
+        // **NUEVAS REFERENCIAS PARA EL LOGO**
+        const siteLogo = document.getElementById('siteLogo');
+        const defaultLogoIcon = document.getElementById('defaultLogoIcon');
 
         let currentUser = null;
         let isAdmin = false;
@@ -362,7 +397,39 @@
         function showError(errorElement, message) { errorElement.textContent = message; errorElement.style.display = 'block'; }
         function hideError(errorElement) { errorElement.style.display = 'none'; }
 
-        // --- 4. LÓGICA DE AUTENTICACIÓN ---
+        // --- 4. LÓGICA DE AUTENTICACIÓN Y LOGO ---
+        
+        // **NUEVA FUNCIÓN PARA CARGAR EL LOGO**
+        async function loadLogo() {
+            const { data } = supabaseClient.storage
+                .from(LOGO_BUCKET)
+                .getPublicUrl(LOGO_FILE_PATH);
+
+            if (data && data.publicUrl) {
+                // Usamos un truco anti-caché para mostrar siempre el logo más nuevo
+                const logoUrlWithCacheBust = `${data.publicUrl}?t=${new Date().getTime()}`;
+                
+                // Verificamos si la imagen existe antes de mostrarla
+                const img = new Image();
+                img.onload = () => {
+                    // Si la imagen carga, la mostramos
+                    siteLogo.src = logoUrlWithCacheBust;
+                    siteLogo.style.display = 'block';
+                    defaultLogoIcon.style.display = 'none';
+                };
+                img.onerror = () => {
+                    // Si falla (ej. 404), mostramos el icono por defecto
+                    siteLogo.style.display = 'none';
+                    defaultLogoIcon.style.display = 'block';
+                };
+                img.src = logoUrlWithCacheBust;
+            } else {
+                // No hay URL, mostrar el icono
+                siteLogo.style.display = 'none';
+                defaultLogoIcon.style.display = 'block';
+            }
+        }
+
         async function checkSession() {
             try {
                 const { data: { session }, error } = await supabaseClient.auth.getSession();
@@ -376,26 +443,48 @@
             } finally {
                 updateUIBasedOnAuth();
                 loadMovies(); 
+                loadLogo(); // << CARGAMOS EL LOGO AL INICIAR
             }
         }
 
         function updateUIBasedOnAuth() {
             authBtnText.textContent = currentUser ? 'Perfil' : 'Login';
             document.body.classList.toggle('admin-mode', isAdmin);
-            // document.getElementById('openUploadModal').style.display = isAdmin ? 'flex' : 'none'; // Descomenta si solo admin puede ver el botón
+            // document.getElementById('openUploadModal').style.display = isAdmin ? 'flex' : 'none'; 
         }
 
+        // **MODIFICADA: renderAuthUI para incluir el botón de subir logo**
         function renderAuthUI() {
             hideError(modalAuthError);
             if (currentUser) {
+                // HTML para las herramientas de admin (subir logo)
+                const adminTools = `
+                    <div style="border-top: 1px solid #444; margin-top: 20px; padding-top: 20px;">
+                        <h3 class="modal-title" style="font-size: 1.4rem; color: #4ecdc4; margin-bottom: 15px;">Herramientas Admin</h3>
+                        <div class="form-group">
+                            <label for="logoUploadInput" class="action-btn" style="width: 100%; text-align: center; cursor: pointer; background: linear-gradient(45deg, #4ecdc4, #6aede1);">
+                                <i class="fas fa-image"></i> Cambiar Logo del Sitio
+                            </label>
+                            <input type="file" id="logoUploadInput" accept="image/png, image/jpeg, image/gif" style="display: none;">
+                            <span id="logoUploadStatus" style="font-size: 0.9rem; color: #aaa; text-align: center; display: block; margin-top: 10px;"></span>
+                        </div>
+                    </div>
+                `;
+
                 authContainer.innerHTML = `
                     <div class="modal-header"><h2 class="modal-title">Perfil</h2></div>
                     <p>Conectado como: <strong>${currentUser.email}</strong></p>
                     ${isAdmin ? '<p style="color: #4ecdc4; font-weight: bold; margin-top: 5px;">Tienes permisos de Administrador.</p>' : ''}
-                    <button id="modalLogoutBtn" class="action-btn" style="margin-top: 20px; width: auto;">Cerrar Sesión</button>
-                `;
+                    <button id="modalLogoutBtn" class="action-btn" style="margin-top: 20px; width: 100%;">Cerrar Sesión</button>
+                    ${isAdmin ? adminTools : ''} `;
                 document.getElementById('modalLogoutBtn').addEventListener('click', handleLogout);
+                
+                // Si es admin, añadir el listener para el input del logo
+                if (isAdmin) {
+                    document.getElementById('logoUploadInput').addEventListener('change', handleLogoUpload);
+                }
             } else {
+                // ... (código de login sin cambios) ...
                 authContainer.innerHTML = `
                     <div class="modal-header"><h2 class="modal-title">Iniciar Sesión</h2></div>
                     <form id="loginForm">
@@ -416,12 +505,56 @@
             }
         }
 
+        // **NUEVA FUNCIÓN: handleLogoUpload**
+        async function handleLogoUpload(e) {
+            const file = e.target.files[0];
+            const statusEl = document.getElementById('logoUploadStatus');
+            if (!file) {
+                statusEl.textContent = 'No se seleccionó archivo.';
+                return;
+            }
+
+            statusEl.textContent = 'Subiendo logo...';
+            
+            try {
+                // 1. Subir a Supabase Storage (sobrescribiendo el anterior)
+                const { error: uploadError } = await supabaseClient.storage
+                    .from(LOGO_BUCKET)
+                    .upload(LOGO_FILE_PATH, file, {
+                        cacheControl: '3600',
+                        upsert: true // Sobrescribe el logo anterior
+                    });
+
+                if (uploadError) throw uploadError;
+
+                // 2. Obtener la URL pública (con truco anti-caché)
+                const { data: publicData } = supabaseClient.storage
+                    .from(LOGO_BUCKET)
+                    .getPublicUrl(LOGO_FILE_PATH);
+                
+                const logoUrlWithBust = `${publicData.publicUrl}?t=${new Date().getTime()}`;
+
+                // 3. Actualizar la UI inmediatamente
+                siteLogo.src = logoUrlWithBust;
+                siteLogo.style.display = 'block';
+                defaultLogoIcon.style.display = 'none';
+
+                statusEl.textContent = '¡Logo actualizado!';
+                alert('Logo actualizado.');
+                closeModal('authModal');
+
+            } catch (error) {
+                console.error("Error subiendo logo:", error);
+                statusEl.textContent = `Error: ${error.message}`;
+            }
+        }
+
+
         document.getElementById('openAuthModal').addEventListener('click', () => {
             renderAuthUI();
             openModal('authModal');
         });
 
-        // Listener para abrir el modal de subida
         document.getElementById('openUploadModal').addEventListener('click', () => {
             openModal('uploadModal');
         });
@@ -469,6 +602,7 @@
                  updateUIBasedOnAuth();
                  closeModal('authModal');
                  loadMovies();
+                 loadLogo(); // Recargar el logo por si acaso (vuelve al icono)
                  alert('Sesión cerrada.');
              }
         }
@@ -561,7 +695,7 @@
             }
         });
 
-        // Función auxiliar para obtener URL firmada
+        // Función auxiliar para obtener URL firmada (de R2)
         async function getUploadUrl(functionName, file) {
             const { data, error } = await supabaseClient.functions.invoke(functionName, {
                 body: JSON.stringify({
@@ -701,11 +835,8 @@
             const cover = card.querySelector('.movie-cover');
 
             playButton?.addEventListener('click', () => { 
-                // ======================================================
-                // CORRECCIÓN 1: Ocultar la portada, no hacerla transparente
-                // ======================================================
+                // Esta es la corrección que hicimos antes (funciona)
                 if (cover) cover.style.display = 'none'; 
-                
                 if (playButton) playButton.style.display = 'none';
                 if (video) {
                     video.style.display = 'block';
@@ -713,19 +844,13 @@
                 }
             });
 
-            video?.addEventListener('pause', () => { /* ... lógica opcional ... */ });
-
             video?.addEventListener('ended', () => {
-                 // ======================================================
-                 // CORRECCIÓN 2: Volver a mostrar la portada al terminar
-                 // ======================================================
                  if (cover) cover.style.display = 'block'; 
-                 
                  if (playButton) playButton.style.display = 'block';
                  if (video) { video.style.display = 'none'; video.currentTime = 0; }
             });
 
-            // El listener del botón "Like" ya estaba aquí y es funcional
+            // El listener del botón "Like" (funciona)
             const likeButton = card.querySelector('.like-btn');
             likeButton?.addEventListener('click', function() { 
                 const icon = this.querySelector('i');
@@ -821,7 +946,7 @@
             }
         });
 
-        // Borrar película (SOLO de la DB Supabase)
+        // Borrar película
         async function deleteMovie(movieId) {
              if (!isAdmin) return;
              const movieCard = document.querySelector(`[data-movie-id="${movieId}"]`);
