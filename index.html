@@ -3,175 +3,214 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KLMZ PELIS - Con Admin Integrado</title>
+    <title>KLMZ PELIS - Luxury Gold</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
-        /* --- ESTILOS CSS COMPLETOS --- */
+        /* --- ESTILOS CSS COMPLETOS - TEMA LUXURY GOLD --- */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); color: #fff; min-height: 100vh; }
+        body {
+            background: linear-gradient(135deg, #1a1a1a 0%, #333333 50%, #1a1a1a 100%); /* Negro/Gris oscuro */
+            color: #f0f0f0; /* Texto principal casi blanco */
+            min-height: 100vh;
+        }
         .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
-        header { background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(10px); padding: 20px 0; margin-bottom: 30px; border-bottom: 2px solid #ff6b6b; }
+        header {
+            background: rgba(0, 0, 0, 0.8); /* Fondo negro más opaco */
+            backdrop-filter: blur(10px);
+            padding: 20px 0; margin-bottom: 30px;
+            border-bottom: 3px solid #FFD700; /* Borde dorado */
+        }
         .header-content { display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; }
 
-        /* --- 1. CSS DEL LOGO (Pequeño y Profesional) --- */
+        /* --- 1. LOGO MUY GRANDE --- */
         .logo { display: flex; align-items: center; gap: 15px; }
         .logo i#defaultLogoIcon {
-            font-size: 2rem; /* Reducido para coincidir con logo pequeño */
-            color: #ff6b6b;
+            font-size: 4rem; /* Icono grande */
+            color: #FFD700; /* Dorado */
             display: block;
         }
         .logo img#siteLogo {
-            height: 40px; /* <<-- ALTURA REDUCIDA (antes 80px) */
-            width: auto; /* Mantiene proporción */
-            /* max-width eliminado para mantener proporción */
-            border-radius: 6px; /* Borde ligeramente más sutil */
+            height: 100px; /* <<-- ALTURA MUY GRANDE */
+            width: auto;
+            max-width: 350px; /* Ancho máximo aumentado */
+            border-radius: 10px;
             display: none;
-            object-fit: contain; /* Asegura que el logo no se corte */
+            object-fit: contain;
         }
-        .logo h1 { font-size: 2.2rem; font-weight: 700; background: linear-gradient(45deg, #ff6b6b, #4ecdc4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .logo h1 {
+            font-size: 2.8rem; /* Texto más grande */
+            font-weight: 700;
+            background: linear-gradient(45deg, #FFD700, #B8860B); /* Dorado */
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
 
         .search-bar { position: relative; flex-grow: 1; max-width: 500px; min-width: 200px; }
         .search-bar i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #aaa; }
-        .search-bar input { width: 100%; padding: 12px 12px 12px 40px; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 50px; color: white; font-size: 1rem; outline: none; transition: all 0.3s ease; }
-        .search-bar input:focus { border-color: #ff6b6b; box-shadow: 0 0 15px rgba(255, 107, 107, 0.3); }
+        .search-bar input {
+            width: 100%; padding: 12px 12px 12px 40px;
+            background: rgba(255, 255, 255, 0.1); /* Fondo claro semi-transparente */
+            border: 1px solid rgba(255, 215, 0, 0.3); /* Borde dorado tenue */
+            border-radius: 50px; color: white; font-size: 1rem; outline: none; transition: all 0.3s ease;
+        }
+        .search-bar input:focus {
+            border-color: #FFD700; /* Borde dorado al enfocar */
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+        }
 
-        /* Header Buttons Styling (Iconos) */
+        /* Header Buttons Styling (Iconos Dorados) */
         .header-actions { display: flex; align-items: center; gap: 15px; }
         .icon-btn {
-            background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
-            color: white;
-            border: none;
-            padding: 10px 12px;
-            font-size: 1.2rem;
-            border-radius: 50%;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 44px;
-            height: 44px;
-            flex-shrink: 0;
+            background: linear-gradient(45deg, #B8860B, #FFD700); /* Dorado */
+            color: #1a1a1a; /* Icono oscuro para contraste */
+            border: none; padding: 10px 12px; font-size: 1.2rem; border-radius: 50%;
+            cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center;
+            width: 44px; height: 44px; flex-shrink: 0;
         }
-        .icon-btn.profile-btn { background: linear-gradient(45deg, #4ecdc4, #6aede1); }
-        .icon-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(255, 107, 107, 0.4); }
-        .icon-btn.profile-btn:hover { box-shadow: 0 10px 25px rgba(78, 205, 196, 0.4); }
+        .icon-btn.profile-btn { /* Mismo estilo dorado */
+             background: linear-gradient(135deg, #B8860B, #FFD700);
+        }
+        .icon-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(255, 215, 0, 0.4); /* Sombra dorada */
+        }
 
         /* Estilos del contenido principal y tarjetas */
         .main-content { display: grid; grid-template-columns: 1fr; gap: 30px; margin-bottom: 40px; }
-        .movie-section { background: rgba(255, 255, 255, 0.08); border-radius: 20px; padding: 30px; backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .section-title { font-size: 2rem; margin-bottom: 25px; color: #4ecdc4; display: flex; align-items: center; gap: 10px; }
+        .movie-section {
+            background: rgba(0, 0, 0, 0.5); /* Fondo más oscuro */
+            border-radius: 20px; padding: 30px; backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 215, 0, 0.2); /* Borde dorado tenue */
+        }
+        .section-title {
+            font-size: 2rem; margin-bottom: 25px;
+            color: #FFD700; /* Título dorado */
+            display: flex; align-items: center; gap: 10px;
+        }
         .movie-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px; }
-        .movie-card { background: rgba(0, 0, 0, 0.4); border-radius: 15px; overflow: hidden; transition: all 0.3s ease; border: 1px solid rgba(255, 255, 255, 0.1); display: flex; flex-direction: column; position: relative; }
-        .movie-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3); border-color: rgba(255, 107, 107, 0.3); }
+        .movie-card {
+            background: rgba(10, 10, 10, 0.7); /* Fondo casi negro */
+            border-radius: 15px; overflow: hidden; transition: all 0.3s ease;
+            border: 1px solid rgba(255, 215, 0, 0.15); /* Borde dorado muy tenue */
+            display: flex; flex-direction: column; position: relative;
+        }
+        .movie-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            border-color: rgba(255, 215, 0, 0.4); /* Borde dorado más visible al pasar */
+        }
         .movie-player { width: 100%; aspect-ratio: 16 / 9; background: #000; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.2rem; font-weight: 600; text-align: center; position: relative; overflow: hidden; }
         .movie-cover { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; z-index: 1; transition: opacity 0.3s ease; }
         .movie-player video { width: 100%; height: 100%; object-fit: cover; display: none; background-color: #000; z-index: 0; position: relative; }
-        .play-button { background: rgba(255, 107, 107, 0.8); border: none; color: white; width: 60px; height: 60px; border-radius: 50%; font-size: 1.5rem; cursor: pointer; transition: all 0.3s ease; z-index: 2; position: absolute; }
-        .play-button:hover { background: rgba(255, 107, 107, 1); transform: scale(1.1); }
+        .play-button {
+            background: rgba(255, 215, 0, 0.8); /* Botón Play dorado */
+            border: none; color: #1a1a1a; /* Icono oscuro */
+            width: 60px; height: 60px; border-radius: 50%; font-size: 1.5rem; cursor: pointer; transition: all 0.3s ease; z-index: 2; position: absolute;
+        }
+        .play-button:hover { background: rgba(255, 215, 0, 1); transform: scale(1.1); }
         .movie-info { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; }
-        .movie-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 10px; color: #fff; flex-grow: 1; word-break: break-word; overflow-wrap: break-word; }
+        .movie-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 10px; color: #f0f0f0; flex-grow: 1; word-break: break-word; overflow-wrap: break-word; }
         .movie-meta { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 15px; color: #aaa; font-size: 0.9rem; }
         .movie-actions { display: flex; justify-content: space-between; align-items: center; margin-top: auto; }
-        .like-btn { background: rgba(255, 107, 107, 0.2); border: 1px solid #ff6b6b; color: #ff6b6b; padding: 8px 15px; border-radius: 20px; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; gap: 8px; }
-        .like-btn:hover { background: rgba(255, 107, 107, 0.4); }
+        .like-btn {
+            background: rgba(255, 215, 0, 0.1); /* Fondo dorado tenue */
+            border: 1px solid #B8860B; /* Borde dorado oscuro */
+            color: #FFD700; /* Texto/Icono dorado */
+            padding: 8px 15px; border-radius: 20px; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; gap: 8px;
+        }
+        .like-btn:hover { background: rgba(255, 215, 0, 0.2); }
         .movie-stats { display: flex; align-items: center; gap: 15px; }
         .stat { display: flex; align-items: center; gap: 5px; color: #aaa; font-size: 0.9rem; }
-        .stat i { color: #ff6b6b; }
+        .stat i { color: #FFD700; } /* Icono ojo dorado */
 
-        /* --- ESTILOS ADMIN (Tarjeta) --- */
-        .admin-actions {
-            position: absolute; top: 10px; right: 10px; z-index: 3; display: none; gap: 8px;
-            background: rgba(0,0,0,0.7); padding: 8px; border-radius: 5px;
-        }
+        /* Estilos Admin (Tarjeta) */
+        .admin-actions { position: absolute; top: 10px; right: 10px; z-index: 3; display: none; gap: 8px; background: rgba(0,0,0,0.7); padding: 8px; border-radius: 5px; }
         .admin-actions button { background: none; border: none; color: white; cursor: pointer; font-size: 1rem; padding: 5px; line-height: 1; transition: color 0.2s ease; }
-        .admin-actions button:hover { color: #ffc107; }
-        .btn-delete-admin:hover { color: #dc3545; }
+        .admin-actions button:hover { color: #FFD700; } /* Hover dorado */
+        .btn-delete-admin:hover { color: #dc3545; } /* Mantener rojo para borrar */
         body.admin-mode .admin-actions { display: flex; }
 
-        /* Estilos Modales */
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.8); backdrop-filter: blur(5px); padding: 20px; }
-        .modal-content { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); margin: 5% auto; padding: 30px; width: 95%; max-width: 600px; border-radius: 20px; border: 1px solid rgba(255, 107, 107, 0.3); position: relative;}
+        /* Estilos Modales (Tema Dorado) */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.9); backdrop-filter: blur(5px); padding: 20px; }
+        .modal-content {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2b2b2b 100%); /* Fondo modal negro/gris */
+            margin: 5% auto; padding: 30px; width: 95%; max-width: 600px; border-radius: 20px;
+            border: 1px solid rgba(255, 215, 0, 0.3); /* Borde dorado */
+            position: relative;
+        }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-right: 40px; }
-        .modal-title { font-size: 1.8rem; color: #ff6b6b; }
-        .close-modal { background: none; border: none; color: white; font-size: 1.8rem; cursor: pointer; padding: 5px; line-height: 1; position: absolute; top: 15px; right: 20px; }
+        .modal-title { font-size: 1.8rem; color: #FFD700; } /* Título modal dorado */
+        .close-modal { background: none; border: none; color: #aaa; font-size: 1.8rem; cursor: pointer; padding: 5px; line-height: 1; position: absolute; top: 15px; right: 20px; transition: color 0.2s; }
+        .close-modal:hover { color: #FFD700; }
         .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #4ecdc4; }
-        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 12px; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 10px; color: white; font-size: 1rem; box-sizing: border-box;}
-        .form-group input:-webkit-autofill { -webkit-box-shadow: 0 0 0 30px #16213e inset !important; -webkit-text-fill-color: white !important; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #FFD700; } /* Labels dorados */
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%; padding: 12px; background: rgba(255, 255, 255, 0.05); /* Input ligeramente claro */
+            border: 1px solid rgba(255, 215, 0, 0.3); border-radius: 10px; color: white; font-size: 1rem; box-sizing: border-box;
+        }
+        .form-group input:-webkit-autofill { -webkit-box-shadow: 0 0 0 30px #2b2b2b inset !important; -webkit-text-fill-color: white !important; }
         .form-group textarea { resize: vertical; min-height: 100px; }
         .form-group img { max-width: 150px; max-height: 150px; display: block; margin-top: 10px; border-radius: 5px; border: 1px solid #444;}
-        .file-input-container { position: relative; border: 2px dashed rgba(255, 107, 107, 0.3); border-radius: 10px; padding: 30px; text-align: center; cursor: pointer; transition: all 0.3s ease; }
-        .file-input-container:hover { border-color: #ff6b6b; background: rgba(255, 107, 107, 0.1); }
+        .file-input-container { position: relative; border: 2px dashed rgba(255, 215, 0, 0.4); border-radius: 10px; padding: 30px; text-align: center; cursor: pointer; transition: all 0.3s ease; }
+        .file-input-container:hover { border-color: #FFD700; background: rgba(255, 215, 0, 0.05); }
         .file-input { position: absolute; top:0; left:0; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
         .file-label { display: flex; flex-direction: column; align-items: center; gap: 10px; pointer-events: none; }
-        .file-label i { font-size: 2.5rem; color: #ff6b6b; }
+        .file-label i { font-size: 2.5rem; color: #FFD700; } /* Icono upload dorado */
         .file-label span { word-break: break-all; }
-        .submit-btn, .action-btn { background: linear-gradient(45deg, #ff6b6b, #ff8e8e); color: white; border: none; padding: 15px; border-radius: 10px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; }
-        .action-btn { background: linear-gradient(45deg, #4ecdc4, #6aede1); font-size: 1rem; padding: 12px 20px; }
-        .submit-btn:disabled, .action-btn:disabled { background: #aaa; cursor: not-allowed; opacity: 0.7; transform: none; box-shadow: none; }
-        .submit-btn:hover:not(:disabled), .action-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(255, 107, 107, 0.4); }
-        .action-btn:hover:not(:disabled) { box-shadow: 0 10px 25px rgba(78, 205, 196, 0.4); }
-        .error-message { color: #ff6b6b; margin-top: 15px; font-size: 0.9rem; text-align: center; }
+        .submit-btn, .action-btn { /* Botones principales dorados */
+            background: linear-gradient(45deg, #B8860B, #FFD700);
+            color: #1a1a1a; /* Texto oscuro */
+            border: none; padding: 15px; border-radius: 10px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%;
+        }
+        .action-btn { font-size: 1rem; padding: 12px 20px; }
+        .submit-btn:disabled, .action-btn:disabled { background: #555; color: #999; cursor: not-allowed; opacity: 0.7; transform: none; box-shadow: none; }
+        .submit-btn:hover:not(:disabled), .action-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(255, 215, 0, 0.4); }
+        .error-message { color: #FF6347; margin-top: 15px; font-size: 0.9rem; text-align: center; } /* Error en rojo tomate */
         .loader { border: 4px solid rgba(255,255,255,0.3); border-top: 4px solid #fff; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; margin-left: 10px; vertical-align: middle; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* CSS PARA BARRA DE PROGRESO */
-        .progress-bar-background { width: 100%; background: rgba(0, 0, 0, 0.3); border-radius: 10px; height: 20px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.2); margin-top: 5px; }
-        .progress-bar-fill { width: 0%; height: 100%; background: linear-gradient(45deg, #4ecdc4, #6aede1); transition: width 0.2s ease-out; }
+        /* CSS PARA BARRA DE PROGRESO (Dorada) */
+        .progress-bar-background { width: 100%; background: rgba(255, 255, 255, 0.1); border-radius: 10px; height: 20px; overflow: hidden; border: 1px solid rgba(255, 215, 0, 0.3); margin-top: 5px; }
+        .progress-bar-fill { width: 0%; height: 100%; background: linear-gradient(45deg, #B8860B, #FFD700); transition: width 0.2s ease-out; }
         #progressContainer { display: none; margin-bottom: 15px; }
-        #progressText { display: block; text-align: center; font-size: 0.9rem; color: #fff; margin-top: 5px; font-weight: 600; }
+        #progressText { display: block; text-align: center; font-size: 0.9rem; color: #ccc; margin-top: 5px; font-weight: 600; }
 
-        /* --- 2. CSS PARA ADMIN PANEL EN MODAL --- */
+        /* --- 3. CSS PARA ADMIN PANEL REDISEÑADO --- */
         .admin-tools-section {
-            border-top: 1px solid rgba(255, 255, 255, 0.15); /* Separador más sutil */
+            border-top: 1px solid rgba(255, 215, 0, 0.2); /* Separador dorado tenue */
             margin-top: 25px;
             padding-top: 25px;
         }
         .admin-tools-title {
-            font-size: 1.4rem;
-            color: #4ecdc4; /* Color consistente */
+            font-size: 1.6rem; /* Título más prominente */
+            color: #FFD700; /* Dorado */
             margin-bottom: 20px;
-            text-align: center; /* Centrar título */
-        }
-        /* Estilo para el botón/label de subir logo */
-        .admin-logo-upload-label {
-            display: flex; /* Para centrar icono y texto */
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            background: linear-gradient(45deg, #4ecdc4, #6aede1); /* Usar el color del perfil */
-            color: white;
-            padding: 12px 20px;
-            border-radius: 10px;
-            font-size: 1rem;
-            font-weight: 600;
             text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            width: 100%;
+            font-weight: 600;
+        }
+        .admin-logo-upload-label { /* Botón/Label de subir logo */
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            background: rgba(255, 215, 0, 0.1); /* Fondo dorado muy tenue */
+            color: #FFD700; /* Texto dorado */
+            border: 1px solid #B8860B; /* Borde dorado oscuro */
+            padding: 12px 20px; border-radius: 10px; font-size: 1rem; font-weight: 600;
+            text-align: center; cursor: pointer; transition: all 0.3s ease; width: 100%;
         }
         .admin-logo-upload-label:hover {
+             background: rgba(255, 215, 0, 0.2); /* Más dorado al pasar */
              transform: translateY(-2px);
-             box-shadow: 0 10px 25px rgba(78, 205, 196, 0.4);
+             box-shadow: 0 5px 15px rgba(255, 215, 0, 0.2);
         }
-        #logoUploadStatus { /* Estilo del texto de estado */
-            font-size: 0.9rem;
-            color: #aaa;
-            text-align: center;
-            display: block;
-            margin-top: 10px;
-            min-height: 1.2em; /* Evita que el layout salte */
-        }
+        #logoUploadStatus { font-size: 0.9rem; color: #aaa; text-align: center; display: block; margin-top: 10px; min-height: 1.2em; }
 
-        /* Footer y Scrollbar */
-        footer { text-align: center; padding: 30px 20px; color: #aaa; border-top: 1px solid rgba(255, 255, 255, 0.1); margin-top: 20px; }
-        .developer-info { margin-top: 10px; font-style: italic; color: #4ecdc4; }
+        /* Footer y Scrollbar (Dorado) */
+        footer { text-align: center; padding: 30px 20px; color: #aaa; border-top: 1px solid rgba(255, 215, 0, 0.1); margin-top: 20px; }
+        .developer-info { margin-top: 10px; font-style: italic; color: #FFD700; }
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.2); border-radius: 4px; }
-        ::-webkit-scrollbar-thumb { background: linear-gradient(45deg, #ff6b6b, #4ecdc4); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: linear-gradient(45deg, #B8860B, #FFD700); border-radius: 4px; }
 
         /* --- CSS RESPONSIVO --- */
         @media (max-width: 768px) {
@@ -179,20 +218,22 @@
             .search-bar { max-width: 90%; width: 100%; order: 2; }
             .header-actions { width: 90%; justify-content: center; order: 3; gap: 25px; }
             .logo { order: 1; }
+             .logo img#siteLogo { height: 80px; /* Logo grande también en tablet */ }
+             .logo h1 { font-size: 2.5rem; }
             .movie-grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
             .movie-player { aspect-ratio: 16 / 9; }
         }
         @media (max-width: 480px) {
-            .logo { flex-direction: column; gap: 5px; text-align: center; }
-            .logo i#defaultLogoIcon { font-size: 1.5rem; /* Ajustado al logo móvil */ }
-            .logo img#siteLogo { height: 30px; /* <<-- ALTURA MÓVIL REDUCIDA */ }
-            .logo h1 { font-size: 1.8rem; }
+            .logo { flex-direction: column; gap: 10px; text-align: center; }
+            .logo i#defaultLogoIcon { font-size: 3rem; /* Icono grande móvil */ }
+            .logo img#siteLogo { height: 70px; /* <<-- ALTURA GRANDE MÓVIL */ }
+            .logo h1 { font-size: 2rem; }
             .movie-grid { grid-template-columns: 1fr; }
             .section-title { font-size: 1.6rem; }
             .modal-content { margin: 10% auto; padding: 20px;}
             .modal-title { font-size: 1.5rem; }
             .header-actions { flex-direction: row; }
-            .icon-btn { width: 40px; height: 40px; font-size: 1rem; } /* Iconos ligeramente más pequeños */
+            .icon-btn { width: 40px; height: 40px; font-size: 1rem; }
         }
     </style>
 </head>
@@ -204,44 +245,24 @@
                     <i class="fas fa-film" id="defaultLogoIcon"></i>
                     <h1>KLMZ PELIS</h1>
                 </div>
-
                 <div class="search-bar">
                     <i class="fas fa-search"></i>
                     <input type="text" id="searchInput" placeholder="Buscar película por título...">
                 </div>
-
                 <div class="header-actions">
-                    <button class="icon-btn" id="openUploadModal" title="Subir Película">
-                        <i class="fas fa-upload"></i>
-                    </button>
-                    <button class="icon-btn profile-btn" id="openAuthModal" title="Perfil / Login">
-                        <i class="fas fa-user-circle"></i>
-                    </button>
+                    <button class="icon-btn" id="openUploadModal" title="Subir Película"> <i class="fas fa-upload"></i> </button>
+                    <button class="icon-btn profile-btn" id="openAuthModal" title="Perfil / Login"> <i class="fas fa-user-circle"></i> </button>
                 </div>
             </div>
         </header>
 
-        <div class="main-content">
-            <div class="movie-section">
-                <h2 class="section-title"> <i class="fas fa-video"></i> Películas Recientes </h2>
-                <div class="movie-grid" id="movieGrid"> <p style="text-align: center; grid-column: 1 / -1;">Cargando películas...</p> </div>
-            </div>
-        </div>
-        <footer>
-            <p>© 2025 KLMZ PELIS - Todos los Derechos Reservados</p>
-            <p class="developer-info">Desarrollado por Freddy Granados</p>
-        </footer>
+        <div class="main-content"> <div class="movie-section"> <h2 class="section-title"> <i class="fas fa-video"></i> Películas Recientes </h2> <div class="movie-grid" id="movieGrid"> <p style="text-align: center; grid-column: 1 / -1;">Cargando películas...</p> </div> </div> </div>
+        <footer> <p>© 2025 KLMZ PELIS - Todos los Derechos Reservados</p> <p class="developer-info">Desarrollado por Freddy Granados</p> </footer>
     </div>
 
-    <div class="modal" id="uploadModal">
-        <div class="modal-content"> <button class="close-modal" onclick="closeModal('uploadModal')">&times;</button> <div class="modal-header"> <h2 class="modal-title">Subir Película a R2</h2> </div> <form class="upload-form" id="uploadForm"> <div class="form-group"> <label for="movieTitle">Título</label> <input type="text" id="movieTitle" required> </div> <div class="form-group"> <label for="movieYear">Año</label> <input type="number" id="movieYear" min="1900" max="2030" required> </div> <div class="form-group"> <label for="movieGenre">Género</label> <select id="movieGenre" required> <option value="" disabled selected>Selecciona</option> <option value="Terror">Terror</option><option value="Accion">Acción</option><option value="Suspenso">Suspenso</option><option value="Ciencia Ficcion">Ciencia Ficción</option><option value="Drama">Drama</option><option value="Comedia">Comedia</option><option value="Animacion">Animación</option> </select> </div> <div class="form-group"> <label for="movieDescription">Descripción</label> <textarea id="movieDescription" required></textarea> </div> <div class="form-group"> <label for="coverFile">Portada (Opcional, JPG/PNG)</label> <input type="file" id="coverFile" accept="image/jpeg, image/png"> <img id="coverPreview" src="" alt="Vista previa portada" style="display: none;"> </div> <div class="form-group"> <label>Archivo de Video (MP4)</label> <div class="file-input-container"> <input type="file" id="videoFile" class="file-input" accept="video/mp4" required> <div class="file-label"> <i class="fas fa-cloud-upload-alt"></i> <span id="fileLabelText">Selecciona tu archivo de video (.mp4)</span> </div> </div> </div> <div class="form-group" id="progressContainer"> <label id="progressLabel">Subiendo...</label> <div class="progress-bar-background"> <div class="progress-bar-fill" id="progressBarFill"></div> </div> <span id="progressText">0%</span> </div> <button type="submit" class="submit-btn" id="submitUploadBtn"> <i class="fas fa-upload"></i> Subir Película <span id="uploadLoader" class="loader" style="display: none;"></span> </button> <p id="uploadError" class="error-message" style="display: none;"></p> </form> </div>
-    </div>
-    <div class="modal" id="authModal">
-        <div class="modal-content"> <button class="close-modal" onclick="closeModal('authModal')">&times;</button> <div id="authContainer"> </div> <p id="modalAuthError" class="error-message" style="display: none;"></p> </div>
-    </div>
-    <div class="modal" id="editModal">
-        <div class="modal-content"> <button class="close-modal" onclick="closeModal('editModal')">&times;</button> <div class="modal-header"> <h2 class="modal-title">Editar Película</h2> </div> <form id="editForm"> <input type="hidden" id="editMovieId"> <input type="hidden" id="editVideoUrl"> <input type="hidden" id="editCoverUrl"> <div class="form-group"> <label for="editTitle">Título</label> <input type="text" id="editTitle" required> </div> <div class="form-group"> <label for="editYear">Año</label> <input type="number" id="editYear" min="1900" max="2030"> </div> <div class="form-group"> <label for="editGenre">Género</label> <select id="editGenre"> <option value="">Selecciona</option> <option value="Terror">Terror</option><option value="Accion">Acción</option><option value="Suspenso">Suspenso</option><option value="Ciencia Ficcion">Ciencia Ficción</option><option value="Drama">Drama</option><option value="Comedia">Comedia</option><option value="Animacion">Animación</option> </select> </div> <div class="form-group"> <label for="editDescription">Descripción</label> <textarea id="editDescription"></textarea> </div> <div class="form-group"> <label for="editCoverFile">Cambiar Portada (JPG/PNG)</label> <input type="file" id="editCoverFile" accept="image/jpeg, image/png"> <img id="editCoverPreview" src="" alt="Vista previa portada" style="display: none;"> </div> <button type="submit" class="submit-btn" id="saveChangesBtn"> Guardar Cambios <span id="editLoader" class="loader" style="display: none;"></span> </button> <p id="editError" class="error-message" style="display: none;"></p> </form> </div>
-    </div>
+    <div class="modal" id="uploadModal"> <div class="modal-content"> <button class="close-modal" onclick="closeModal('uploadModal')">&times;</button> <div class="modal-header"> <h2 class="modal-title">Subir Película a R2</h2> </div> <form class="upload-form" id="uploadForm"> <div class="form-group"> <label for="movieTitle">Título</label> <input type="text" id="movieTitle" required> </div> <div class="form-group"> <label for="movieYear">Año</label> <input type="number" id="movieYear" min="1900" max="2030" required> </div> <div class="form-group"> <label for="movieGenre">Género</label> <select id="movieGenre" required> <option value="" disabled selected>Selecciona</option> <option value="Terror">Terror</option><option value="Accion">Acción</option><option value="Suspenso">Suspenso</option><option value="Ciencia Ficcion">Ciencia Ficción</option><option value="Drama">Drama</option><option value="Comedia">Comedia</option><option value="Animacion">Animación</option> </select> </div> <div class="form-group"> <label for="movieDescription">Descripción</label> <textarea id="movieDescription" required></textarea> </div> <div class="form-group"> <label for="coverFile">Portada (Opcional, JPG/PNG)</label> <input type="file" id="coverFile" accept="image/jpeg, image/png"> <img id="coverPreview" src="" alt="Vista previa portada" style="display: none;"> </div> <div class="form-group"> <label>Archivo de Video (MP4)</label> <div class="file-input-container"> <input type="file" id="videoFile" class="file-input" accept="video/mp4" required> <div class="file-label"> <i class="fas fa-cloud-upload-alt"></i> <span id="fileLabelText">Selecciona tu archivo de video (.mp4)</span> </div> </div> </div> <div class="form-group" id="progressContainer"> <label id="progressLabel">Subiendo...</label> <div class="progress-bar-background"> <div class="progress-bar-fill" id="progressBarFill"></div> </div> <span id="progressText">0%</span> </div> <button type="submit" class="submit-btn" id="submitUploadBtn"> <i class="fas fa-upload"></i> Subir Película <span id="uploadLoader" class="loader" style="display: none;"></span> </button> <p id="uploadError" class="error-message" style="display: none;"></p> </form> </div> </div>
+    <div class="modal" id="authModal"> <div class="modal-content"> <button class="close-modal" onclick="closeModal('authModal')">&times;</button> <div id="authContainer"> </div> <p id="modalAuthError" class="error-message" style="display: none;"></p> </div> </div>
+    <div class="modal" id="editModal"> <div class="modal-content"> <button class="close-modal" onclick="closeModal('editModal')">&times;</button> <div class="modal-header"> <h2 class="modal-title">Editar Película</h2> </div> <form id="editForm"> <input type="hidden" id="editMovieId"> <input type="hidden" id="editVideoUrl"> <input type="hidden" id="editCoverUrl"> <div class="form-group"> <label for="editTitle">Título</label> <input type="text" id="editTitle" required> </div> <div class="form-group"> <label for="editYear">Año</label> <input type="number" id="editYear" min="1900" max="2030"> </div> <div class="form-group"> <label for="editGenre">Género</label> <select id="editGenre"> <option value="">Selecciona</option> <option value="Terror">Terror</option><option value="Accion">Acción</option><option value="Suspenso">Suspenso</option><option value="Ciencia Ficcion">Ciencia Ficción</option><option value="Drama">Drama</option><option value="Comedia">Comedia</option><option value="Animacion">Animación</option> </select> </div> <div class="form-group"> <label for="editDescription">Descripción</label> <textarea id="editDescription"></textarea> </div> <div class="form-group"> <label for="editCoverFile">Cambiar Portada (JPG/PNG)</label> <input type="file" id="editCoverFile" accept="image/jpeg, image/png"> <img id="editCoverPreview" src="" alt="Vista previa portada" style="display: none;"> </div> <button type="submit" class="submit-btn" id="saveChangesBtn"> Guardar Cambios <span id="editLoader" class="loader" style="display: none;"></span> </button> <p id="editError" class="error-message" style="display: none;"></p> </form> </div> </div>
 
     <script>
         // --- 1. CONFIGURACIÓN ---
@@ -255,36 +276,8 @@
         const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         // --- 2. REFERENCIAS GLOBALES ---
-        const authModal = document.getElementById('authModal');
-        const uploadModal = document.getElementById('uploadModal');
-        const editModal = document.getElementById('editModal');
-        const authContainer = document.getElementById('authContainer');
-        const movieGrid = document.getElementById('movieGrid');
-        const uploadForm = document.getElementById('uploadForm');
-        const editForm = document.getElementById('editForm');
-        const videoFileInput = document.getElementById('videoFile');
-        const coverFileInput = document.getElementById('coverFile');
-        const editCoverFileInput = document.getElementById('editCoverFile');
-        const fileLabelText = document.getElementById('fileLabelText');
-        const submitUploadBtn = document.getElementById('submitUploadBtn');
-        const uploadLoader = document.getElementById('uploadLoader');
-        const uploadError = document.getElementById('uploadError');
-        const coverPreview = document.getElementById('coverPreview');
-        const editCoverPreview = document.getElementById('editCoverPreview');
-        const saveChangesBtn = document.getElementById('saveChangesBtn');
-        const editLoader = document.getElementById('editLoader');
-        const editError = document.getElementById('editError');
-        const searchInput = document.getElementById('searchInput');
-        const modalAuthError = document.getElementById('modalAuthError');
-        const progressContainer = document.getElementById('progressContainer');
-        const progressLabel = document.getElementById('progressLabel');
-        const progressBarFill = document.getElementById('progressBarFill');
-        const progressText = document.getElementById('progressText');
-        const siteLogo = document.getElementById('siteLogo');
-        const defaultLogoIcon = document.getElementById('defaultLogoIcon');
-
-        let currentUser = null;
-        let isAdmin = false;
+        const authModal = document.getElementById('authModal'); const uploadModal = document.getElementById('uploadModal'); const editModal = document.getElementById('editModal'); const authContainer = document.getElementById('authContainer'); const movieGrid = document.getElementById('movieGrid'); const uploadForm = document.getElementById('uploadForm'); const editForm = document.getElementById('editForm'); const videoFileInput = document.getElementById('videoFile'); const coverFileInput = document.getElementById('coverFile'); const editCoverFileInput = document.getElementById('editCoverFile'); const fileLabelText = document.getElementById('fileLabelText'); const submitUploadBtn = document.getElementById('submitUploadBtn'); const uploadLoader = document.getElementById('uploadLoader'); const uploadError = document.getElementById('uploadError'); const coverPreview = document.getElementById('coverPreview'); const editCoverPreview = document.getElementById('editCoverPreview'); const saveChangesBtn = document.getElementById('saveChangesBtn'); const editLoader = document.getElementById('editLoader'); const editError = document.getElementById('editError'); const searchInput = document.getElementById('searchInput'); const modalAuthError = document.getElementById('modalAuthError'); const progressContainer = document.getElementById('progressContainer'); const progressLabel = document.getElementById('progressLabel'); const progressBarFill = document.getElementById('progressBarFill'); const progressText = document.getElementById('progressText'); const siteLogo = document.getElementById('siteLogo'); const defaultLogoIcon = document.getElementById('defaultLogoIcon');
+        let currentUser = null; let isAdmin = false;
 
         // --- 3. FUNCIONES UTILITARIAS ---
         function openModal(modalId) { document.getElementById(modalId).style.display = 'block'; }
@@ -305,24 +298,17 @@
                 img.src = logoUrlWithCacheBust;
             } else { siteLogo.style.display = 'none'; defaultLogoIcon.style.display = 'block'; }
         }
-
         async function checkSession() {
-            try {
-                const { data: { session }, error } = await supabaseClient.auth.getSession();
-                if (error) throw error;
-                currentUser = session?.user ?? null;
-                isAdmin = currentUser?.email === ADMIN_EMAIL;
-            } catch (error) { console.error("Error checking session:", error); currentUser = null; isAdmin = false; }
+            try { const { data: { session }, error } = await supabaseClient.auth.getSession(); if (error) throw error; currentUser = session?.user ?? null; isAdmin = currentUser?.email === ADMIN_EMAIL; }
+            catch (error) { console.error("Error checking session:", error); currentUser = null; isAdmin = false; }
             finally { updateUIBasedOnAuth(); loadMovies(); loadLogo(); }
         }
-
         function updateUIBasedOnAuth() { document.body.classList.toggle('admin-mode', isAdmin); }
 
-        // **MODIFICADA: renderAuthUI con mejor diseño para admin**
+        // **MODIFICADA: renderAuthUI con nuevas clases CSS para admin**
         function renderAuthUI() {
             hideError(modalAuthError);
             if (currentUser) {
-                // HTML para las herramientas de admin con nuevas clases CSS
                 const adminTools = `
                     <div class="admin-tools-section">
                         <h3 class="admin-tools-title">Herramientas Admin</h3>
@@ -333,185 +319,43 @@
                             <input type="file" id="logoUploadInput" accept="image/png, image/jpeg, image/gif" style="display: none;">
                             <span id="logoUploadStatus"></span>
                         </div>
-                    </div>
-                `;
-
-                authContainer.innerHTML = `
-                    <div class="modal-header"><h2 class="modal-title">Perfil</h2></div>
-                    <p>Conectado como: <strong>${currentUser.email}</strong></p>
-                    ${isAdmin ? '<p style="color: #4ecdc4; font-weight: bold; margin-top: 5px;">Tienes permisos de Administrador.</p>' : ''}
-                    <button id="modalLogoutBtn" class="action-btn" style="margin-top: 20px; width: 100%;">Cerrar Sesión</button>
-                    ${isAdmin ? adminTools : ''}
-                `;
+                    </div>`;
+                authContainer.innerHTML = ` <div class="modal-header"><h2 class="modal-title">Perfil</h2></div> <p>Conectado como: <strong>${currentUser.email}</strong></p> ${isAdmin ? '<p style="color: #FFD700; font-weight: bold; margin-top: 5px;">Tienes permisos de Administrador.</p>' : ''} <button id="modalLogoutBtn" class="action-btn" style="margin-top: 20px; width: 100%;">Cerrar Sesión</button> ${isAdmin ? adminTools : ''} `;
                 document.getElementById('modalLogoutBtn').addEventListener('click', handleLogout);
-
-                if (isAdmin) {
-                    document.getElementById('logoUploadInput').addEventListener('change', handleLogoUpload);
-                }
+                if (isAdmin) { document.getElementById('logoUploadInput').addEventListener('change', handleLogoUpload); }
             } else {
-                authContainer.innerHTML = `
-                    <div class="modal-header"><h2 class="modal-title">Iniciar Sesión</h2></div>
-                    <form id="loginForm"> <div class="form-group"> <label for="modalEmail">Email</label> <input type="email" id="modalEmail" required> </div> <div class="form-group"> <label for="modalPassword">Contraseña</label> <input type="password" id="modalPassword" required> </div> <button type="submit" class="submit-btn" id="modalLoginBtn"> Login <span id="authLoader" class="loader" style="display: none;"></span> </button> </form>
-                `;
+                authContainer.innerHTML = ` <div class="modal-header"><h2 class="modal-title">Iniciar Sesión</h2></div> <form id="loginForm"> <div class="form-group"> <label for="modalEmail">Email</label> <input type="email" id="modalEmail" required> </div> <div class="form-group"> <label for="modalPassword">Contraseña</label> <input type="password" id="modalPassword" required> </div> <button type="submit" class="submit-btn" id="modalLoginBtn"> Login <span id="authLoader" class="loader" style="display: none;"></span> </button> </form> `;
                 document.getElementById('loginForm').addEventListener('submit', handleLogin);
             }
         }
 
-        // Función para subir logo (sin cambios)
-        async function handleLogoUpload(e) {
-            const file = e.target.files[0];
-            const statusEl = document.getElementById('logoUploadStatus');
-            if (!file) { statusEl.textContent = 'No se seleccionó archivo.'; return; }
-            statusEl.textContent = 'Subiendo logo...';
-            try {
-                const { error: uploadError } = await supabaseClient.storage.from(LOGO_BUCKET).upload(LOGO_FILE_PATH, file, { cacheControl: '3600', upsert: true });
-                if (uploadError) throw uploadError;
-                const { data: publicData } = supabaseClient.storage.from(LOGO_BUCKET).getPublicUrl(LOGO_FILE_PATH);
-                const logoUrlWithBust = `${publicData.publicUrl}?t=${new Date().getTime()}`;
-                siteLogo.src = logoUrlWithBust; siteLogo.style.display = 'block'; defaultLogoIcon.style.display = 'none';
-                statusEl.textContent = '¡Logo actualizado!';
-                alert('Logo actualizado.'); closeModal('authModal');
-            } catch (error) { console.error("Error subiendo logo:", error); statusEl.textContent = `Error: ${error.message}`; }
-        }
+        // Subir logo (sin cambios)
+        async function handleLogoUpload(e) { const file = e.target.files[0]; const statusEl = document.getElementById('logoUploadStatus'); if (!file) { statusEl.textContent = 'No se seleccionó archivo.'; return; } statusEl.textContent = 'Subiendo logo...'; try { const { error: uploadError } = await supabaseClient.storage.from(LOGO_BUCKET).upload(LOGO_FILE_PATH, file, { cacheControl: '3600', upsert: true }); if (uploadError) throw uploadError; const { data: publicData } = supabaseClient.storage.from(LOGO_BUCKET).getPublicUrl(LOGO_FILE_PATH); const logoUrlWithBust = `${publicData.publicUrl}?t=${new Date().getTime()}`; siteLogo.src = logoUrlWithBust; siteLogo.style.display = 'block'; defaultLogoIcon.style.display = 'none'; statusEl.textContent = '¡Logo actualizado!'; alert('Logo actualizado.'); closeModal('authModal'); } catch (error) { console.error("Error subiendo logo:", error); statusEl.textContent = `Error: ${error.message}`; } }
 
         document.getElementById('openAuthModal').addEventListener('click', () => { renderAuthUI(); openModal('authModal'); });
         document.getElementById('openUploadModal').addEventListener('click', () => { openModal('uploadModal'); });
 
-        async function handleLogin(e) {
-            e.preventDefault();
-            const email = document.getElementById('modalEmail').value;
-            const password = document.getElementById('modalPassword').value;
-            const loginBtn = document.getElementById('modalLoginBtn');
-            const loader = document.getElementById('authLoader');
-            hideError(modalAuthError); showLoader(loader); loginBtn.disabled = true;
-            try {
-                const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-                if (error) throw error;
-                if (data?.user) {
-                    currentUser = data.user; isAdmin = currentUser.email === ADMIN_EMAIL;
-                    updateUIBasedOnAuth(); closeModal('authModal'); loadMovies(); loadLogo();
-                    alert(`¡Bienvenido ${isAdmin ? 'Admin' : ''}!`);
-                } else { throw new Error("No se recibieron datos de usuario."); }
-            } catch (error) { showError(modalAuthError, `Error: ${error.message}`); console.error("Login error:", error); }
-            finally { hideLoader(loader); if(loginBtn) loginBtn.disabled = false; }
-        }
-
-        async function handleLogout() {
-             const { error } = await supabaseClient.auth.signOut();
-             if (error) { alert(`Error al cerrar sesión: ${error.message}`); }
-             else { currentUser = null; isAdmin = false; updateUIBasedOnAuth(); closeModal('authModal'); loadMovies(); loadLogo(); alert('Sesión cerrada.'); }
-        }
+        async function handleLogin(e) { e.preventDefault(); const email = document.getElementById('modalEmail').value; const password = document.getElementById('modalPassword').value; const loginBtn = document.getElementById('modalLoginBtn'); const loader = document.getElementById('authLoader'); hideError(modalAuthError); showLoader(loader); loginBtn.disabled = true; try { const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password }); if (error) throw error; if (data?.user) { currentUser = data.user; isAdmin = currentUser.email === ADMIN_EMAIL; updateUIBasedOnAuth(); closeModal('authModal'); loadMovies(); loadLogo(); alert(`¡Bienvenido ${isAdmin ? 'Admin' : ''}!`); } else { throw new Error("No se recibieron datos de usuario."); } } catch (error) { showError(modalAuthError, `Error: ${error.message}`); console.error("Login error:", error); } finally { hideLoader(loader); if(loginBtn) loginBtn.disabled = false; } }
+        async function handleLogout() { const { error } = await supabaseClient.auth.signOut(); if (error) { alert(`Error al cerrar sesión: ${error.message}`); } else { currentUser = null; isAdmin = false; updateUIBasedOnAuth(); closeModal('authModal'); loadMovies(); loadLogo(); alert('Sesión cerrada.'); } }
 
         // --- 5. LÓGICA DE SUBIDA (CON PROGRESO) --- (Sin cambios)
-        uploadForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const submitBtnText = submitUploadBtn.innerHTML;
-            const videoFile = videoFileInput.files[0]; const coverFile = coverFileInput.files[0];
-            const title = document.getElementById('movieTitle').value; const year = document.getElementById('movieYear').value; const genre = document.getElementById('movieGenre').value; const description = document.getElementById('movieDescription').value;
-            if (!videoFile) { showError(uploadError, 'Selecciona un archivo de video.'); return; }
-            hideError(uploadError); submitUploadBtn.disabled = true; hideLoader(uploadLoader);
-            progressContainer.style.display = 'none'; progressBarFill.style.width = '0%'; progressText.textContent = '0%';
-            let coverPublicUrl = null; let videoPublicUrl = null;
-            try {
-                if (coverFile) {
-                    submitUploadBtn.firstElementChild.className = 'fas fa-image'; submitUploadBtn.lastChild.textContent = ' Subiendo Portada...';
-                    const { presignedUrl, publicUrl } = await getUploadUrl('get-image-presigned-url', coverFile);
-                    await uploadFileWithProgress(presignedUrl, coverFile, () => {}); coverPublicUrl = publicUrl;
-                }
-                submitUploadBtn.firstElementChild.className = 'fas fa-lock'; submitUploadBtn.lastChild.textContent = ' Autorizando Video...';
-                const { presignedUrl: videoPresignedUrl, publicUrl: vidPublicUrl } = await getUploadUrl('get-presigned-url', videoFile);
-                videoPublicUrl = vidPublicUrl;
-                submitUploadBtn.firstElementChild.className = 'fas fa-spinner fa-spin'; submitUploadBtn.lastChild.textContent = ' Subiendo Video...';
-                progressContainer.style.display = 'block'; progressLabel.textContent = `Subiendo: ${videoFile.name}`;
-                const onVideoProgress = (percent, loaded, total) => {
-                    const loadedMB = (loaded / 1024 / 1024).toFixed(1); const totalMB = (total / 1024 / 1024).toFixed(1);
-                    progressBarFill.style.width = `${percent.toFixed(2)}%`; progressText.textContent = `${percent.toFixed(0)}% (${loadedMB} MB / ${totalMB} MB)`;
-                };
-                await uploadFileWithProgress(videoPresignedUrl, videoFile, onVideoProgress);
-                submitUploadBtn.firstElementChild.className = 'fas fa-database'; submitUploadBtn.lastChild.textContent = ' Guardando datos...';
-                const { data: movieData, error: dbError } = await supabaseClient.from('movies').insert({ title, year: parseInt(year), genre, description, video_url: videoPublicUrl, cover_url: coverPublicUrl }).select().single();
-                if (dbError) throw dbError; if (!movieData) throw new Error("No se recibieron datos al guardar.");
-                alert('¡Película subida! 🎉'); closeModal('uploadModal'); uploadForm.reset(); fileLabelText.textContent = 'Selecciona tu archivo de video (.mp4)'; coverPreview.style.display = 'none';
-                addMovieCardToGrid(movieData);
-            } catch (error) { console.error('Error en subida:', error); showError(uploadError, `Error: ${error.message}`); }
-            finally { submitUploadBtn.disabled = false; submitUploadBtn.innerHTML = submitBtnText; progressContainer.style.display = 'none'; progressBarFill.style.width = '0%'; progressText.textContent = '0%'; }
-        });
-
-        // Función auxiliar para obtener URL firmada (de R2)
-        async function getUploadUrl(functionName, file) {
-            const { data, error } = await supabaseClient.functions.invoke(functionName, { body: JSON.stringify({ fileName: file.name, contentType: file.type || 'application/octet-stream' }) });
-            if (error) throw error; if (data.error) throw new Error(`Error en ${functionName}: ${data.error}`); if (!data.presignedUrl || !data.publicUrl) throw new Error(`Respuesta inválida de ${functionName}.`);
-            return { presignedUrl: data.presignedUrl, publicUrl: data.publicUrl };
-        }
-
-        // Función de subida con XMLHttpRequest (XHR)
-        function uploadFileWithProgress(presignedUrl, file, onProgress) {
-            return new Promise((resolve, reject) => {
-                const xhr = new XMLHttpRequest(); xhr.open('PUT', presignedUrl);
-                xhr.setRequestHeader('Content-Type', file.type || 'application/octet-stream');
-                xhr.upload.onprogress = (event) => { if (event.lengthComputable) { const percent = (event.loaded / event.total) * 100; onProgress(percent, event.loaded, event.total); } };
-                xhr.onload = () => { if (xhr.status >= 200 && xhr.status < 300) { resolve(xhr.response); } else { const match = xhr.responseText.match(/<Message>(.*?)<\/Message>/); const r2Message = match ? match[1] : `Status ${xhr.status}`; reject(new Error(`Falló subida a R2 (${file.name}): ${r2Message}.`)); } };
-                xhr.onerror = () => { reject(new Error('Error de red durante la subida.')); }; xhr.send(file);
-            });
-        }
-
-         // Preview de portada en modal de subida
+        uploadForm.addEventListener('submit', async (e) => { e.preventDefault(); const submitBtnText = submitUploadBtn.innerHTML; const videoFile = videoFileInput.files[0]; const coverFile = coverFileInput.files[0]; const title = document.getElementById('movieTitle').value; const year = document.getElementById('movieYear').value; const genre = document.getElementById('movieGenre').value; const description = document.getElementById('movieDescription').value; if (!videoFile) { showError(uploadError, 'Selecciona un archivo de video.'); return; } hideError(uploadError); submitUploadBtn.disabled = true; hideLoader(uploadLoader); progressContainer.style.display = 'none'; progressBarFill.style.width = '0%'; progressText.textContent = '0%'; let coverPublicUrl = null; let videoPublicUrl = null; try { if (coverFile) { submitUploadBtn.firstElementChild.className = 'fas fa-image'; submitUploadBtn.lastChild.textContent = ' Subiendo Portada...'; const { presignedUrl, publicUrl } = await getUploadUrl('get-image-presigned-url', coverFile); await uploadFileWithProgress(presignedUrl, coverFile, () => {}); coverPublicUrl = publicUrl; } submitUploadBtn.firstElementChild.className = 'fas fa-lock'; submitUploadBtn.lastChild.textContent = ' Autorizando Video...'; const { presignedUrl: videoPresignedUrl, publicUrl: vidPublicUrl } = await getUploadUrl('get-presigned-url', videoFile); videoPublicUrl = vidPublicUrl; submitUploadBtn.firstElementChild.className = 'fas fa-spinner fa-spin'; submitUploadBtn.lastChild.textContent = ' Subiendo Video...'; progressContainer.style.display = 'block'; progressLabel.textContent = `Subiendo: ${videoFile.name}`; const onVideoProgress = (percent, loaded, total) => { const loadedMB = (loaded / 1024 / 1024).toFixed(1); const totalMB = (total / 1024 / 1024).toFixed(1); progressBarFill.style.width = `${percent.toFixed(2)}%`; progressText.textContent = `${percent.toFixed(0)}% (${loadedMB} MB / ${totalMB} MB)`; }; await uploadFileWithProgress(videoPresignedUrl, videoFile, onVideoProgress); submitUploadBtn.firstElementChild.className = 'fas fa-database'; submitUploadBtn.lastChild.textContent = ' Guardando datos...'; const { data: movieData, error: dbError } = await supabaseClient.from('movies').insert({ title, year: parseInt(year), genre, description, video_url: videoPublicUrl, cover_url: coverPublicUrl }).select().single(); if (dbError) throw dbError; if (!movieData) throw new Error("No se recibieron datos al guardar."); alert('¡Película subida! 🎉'); closeModal('uploadModal'); uploadForm.reset(); fileLabelText.textContent = 'Selecciona tu archivo de video (.mp4)'; coverPreview.style.display = 'none'; addMovieCardToGrid(movieData); } catch (error) { console.error('Error en subida:', error); showError(uploadError, `Error: ${error.message}`); } finally { submitUploadBtn.disabled = false; submitUploadBtn.innerHTML = submitBtnText; progressContainer.style.display = 'none'; progressBarFill.style.width = '0%'; progressText.textContent = '0%'; } });
+        async function getUploadUrl(functionName, file) { const { data, error } = await supabaseClient.functions.invoke(functionName, { body: JSON.stringify({ fileName: file.name, contentType: file.type || 'application/octet-stream' }) }); if (error) throw error; if (data.error) throw new Error(`Error en ${functionName}: ${data.error}`); if (!data.presignedUrl || !data.publicUrl) throw new Error(`Respuesta inválida de ${functionName}.`); return { presignedUrl: data.presignedUrl, publicUrl: data.publicUrl }; }
+        function uploadFileWithProgress(presignedUrl, file, onProgress) { return new Promise((resolve, reject) => { const xhr = new XMLHttpRequest(); xhr.open('PUT', presignedUrl); xhr.setRequestHeader('Content-Type', file.type || 'application/octet-stream'); xhr.upload.onprogress = (event) => { if (event.lengthComputable) { const percent = (event.loaded / event.total) * 100; onProgress(percent, event.loaded, event.total); } }; xhr.onload = () => { if (xhr.status >= 200 && xhr.status < 300) { resolve(xhr.response); } else { const match = xhr.responseText.match(/<Message>(.*?)<\/Message>/); const r2Message = match ? match[1] : `Status ${xhr.status}`; reject(new Error(`Falló subida a R2 (${file.name}): ${r2Message}.`)); } }; xhr.onerror = () => { reject(new Error('Error de red durante la subida.')); }; xhr.send(file); }); }
         coverFileInput.addEventListener('change', (e) => { const file = e.target.files[0]; if (file) { const reader = new FileReader(); reader.onload = (event) => { coverPreview.src = event.target.result; coverPreview.style.display = 'block'; }; reader.readAsDataURL(file); } else { coverPreview.style.display = 'none'; coverPreview.src = ''; } });
 
         // --- 6. CARGAR PELÍCULAS Y RENDERIZAR TARJETAS --- (Sin cambios)
-        async function loadMovies() {
-            movieGrid.innerHTML = '<p style="text-align: center; grid-column: 1 / -1;">Cargando películas...</p>';
-            try {
-                const { data: movies, error } = await supabaseClient.from('movies').select('*').order('created_at', { ascending: false });
-                movieGrid.innerHTML = ''; if (error) throw error;
-                if (movies.length === 0) { movieGrid.innerHTML = '<p style="text-align: center; grid-column: 1 / -1;">Aún no hay películas. ¡Sube la primera! 🚀</p>'; }
-                else { movies.forEach(addMovieCardToGrid); }
-            } catch (error) { console.error('Error al cargar películas:', error); movieGrid.innerHTML = `<p style="color: #ff6b6b; text-align: center; grid-column: 1 / -1;">Error al cargar: ${error.message} 😥</p>`; }
-        }
-
-        function addMovieCardToGrid(movie) {
-            if (!movie?.id || !movie.title || !movie.video_url) { console.warn("Datos inválidos para tarjeta:", movie); return; }
-            const card = document.createElement('div'); card.className = 'movie-card'; card.setAttribute('data-movie-id', movie.id); card.setAttribute('data-title', movie.title.toLowerCase());
-            const likes = ((movie.likes || 0) / 1000).toFixed(1) + 'K'; const views = ((movie.views || 0) / 1000).toFixed(1) + 'K';
-            const coverImage = movie.cover_url ? `<img src="${movie.cover_url}" alt="Portada" class="movie-cover">` : '';
-            card.innerHTML = ` <div class="movie-player"> ${coverImage} <video controls preload="metadata"> <source src="${movie.video_url}" type="video/mp4">Tu navegador no soporta video. </video> <button class="play-button"><i class="fas fa-play"></i></button> <div class="admin-actions"> <button class="btn-edit-admin" title="Editar"><i class="fas fa-pencil-alt"></i></button> <button class="btn-delete-admin" title="Eliminar (solo DB)"><i class="fas fa-trash-alt"></i></button> </div> </div> <div class="movie-info"> <h3 class="movie-title">${movie.title}</h3> <div class="movie-meta"> <span>${movie.year || '-'} • ${movie.genre || '-'}</span> <span>⭐ --</span> </div> <div class="movie-actions"> <button class="like-btn"> <i class="far fa-heart"></i> <span>${likes}</span> </button> <div class="movie-stats"> <span class="stat"><i class="fas fa-eye"></i> ${views}</span> </div> </div> </div> `;
-            addCardListeners(card, movie); movieGrid.appendChild(card);
-        }
+        async function loadMovies() { movieGrid.innerHTML = '<p style="text-align: center; grid-column: 1 / -1;">Cargando películas...</p>'; try { const { data: movies, error } = await supabaseClient.from('movies').select('*').order('created_at', { ascending: false }); movieGrid.innerHTML = ''; if (error) throw error; if (movies.length === 0) { movieGrid.innerHTML = '<p style="text-align: center; grid-column: 1 / -1;">Aún no hay películas. ¡Sube la primera! 🚀</p>'; } else { movies.forEach(addMovieCardToGrid); } } catch (error) { console.error('Error al cargar películas:', error); movieGrid.innerHTML = `<p style="color: #FF6347; text-align: center; grid-column: 1 / -1;">Error al cargar: ${error.message} 😥</p>`; } }
+        function addMovieCardToGrid(movie) { if (!movie?.id || !movie.title || !movie.video_url) { console.warn("Datos inválidos para tarjeta:", movie); return; } const card = document.createElement('div'); card.className = 'movie-card'; card.setAttribute('data-movie-id', movie.id); card.setAttribute('data-title', movie.title.toLowerCase()); const likes = ((movie.likes || 0) / 1000).toFixed(1) + 'K'; const views = ((movie.views || 0) / 1000).toFixed(1) + 'K'; const coverImage = movie.cover_url ? `<img src="${movie.cover_url}" alt="Portada" class="movie-cover">` : ''; card.innerHTML = ` <div class="movie-player"> ${coverImage} <video controls preload="metadata"> <source src="${movie.video_url}" type="video/mp4">Tu navegador no soporta video. </video> <button class="play-button"><i class="fas fa-play"></i></button> <div class="admin-actions"> <button class="btn-edit-admin" title="Editar"><i class="fas fa-pencil-alt"></i></button> <button class="btn-delete-admin" title="Eliminar (solo DB)"><i class="fas fa-trash-alt"></i></button> </div> </div> <div class="movie-info"> <h3 class="movie-title">${movie.title}</h3> <div class="movie-meta"> <span>${movie.year || '-'} • ${movie.genre || '-'}</span> <span>⭐ --</span> </div> <div class="movie-actions"> <button class="like-btn"> <i class="far fa-heart"></i> <span>${likes}</span> </button> <div class="movie-stats"> <span class="stat"><i class="fas fa-eye"></i> ${views}</span> </div> </div> </div> `; addCardListeners(card, movie); movieGrid.appendChild(card); }
 
         // --- 7. LISTENERS DE TARJETAS (PLAY, LIKE, ADMIN) --- (Sin cambios)
-        function addCardListeners(card, movie) {
-            const playButton = card.querySelector('.play-button'); const video = card.querySelector('video'); const cover = card.querySelector('.movie-cover');
-            playButton?.addEventListener('click', () => { if (cover) cover.style.display = 'none'; if (playButton) playButton.style.display = 'none'; if (video) { video.style.display = 'block'; video.play(); } });
-            video?.addEventListener('ended', () => { if (cover) cover.style.display = 'block'; if (playButton) playButton.style.display = 'block'; if (video) { video.style.display = 'none'; video.currentTime = 0; } });
-            const likeButton = card.querySelector('.like-btn');
-            likeButton?.addEventListener('click', function() { const icon = this.querySelector('i'); const countEl = this.querySelector('span'); let currentCount = parseFloat(countEl.textContent) || 0; if (icon.classList.contains('fas')) { icon.classList.remove('fas'); icon.classList.add('far'); countEl.textContent = Math.max(0, currentCount - 0.1).toFixed(1) + 'K'; } else { icon.classList.remove('far'); icon.classList.add('fas'); countEl.textContent = (currentCount + 0.1).toFixed(1) + 'K'; } });
-            card.querySelector('.btn-edit-admin')?.addEventListener('click', (e) => { e.stopPropagation(); openEditModal(movie); });
-            card.querySelector('.btn-delete-admin')?.addEventListener('click', (e) => { e.stopPropagation(); deleteMovie(movie.id); });
-        }
+        function addCardListeners(card, movie) { const playButton = card.querySelector('.play-button'); const video = card.querySelector('video'); const cover = card.querySelector('.movie-cover'); playButton?.addEventListener('click', () => { if (cover) cover.style.display = 'none'; if (playButton) playButton.style.display = 'none'; if (video) { video.style.display = 'block'; video.play(); } }); video?.addEventListener('ended', () => { if (cover) cover.style.display = 'block'; if (playButton) playButton.style.display = 'block'; if (video) { video.style.display = 'none'; video.currentTime = 0; } }); const likeButton = card.querySelector('.like-btn'); likeButton?.addEventListener('click', function() { const icon = this.querySelector('i'); const countEl = this.querySelector('span'); let currentCount = parseFloat(countEl.textContent) || 0; if (icon.classList.contains('fas')) { icon.classList.remove('fas'); icon.classList.add('far'); countEl.textContent = Math.max(0, currentCount - 0.1).toFixed(1) + 'K'; } else { icon.classList.remove('far'); icon.classList.add('fas'); countEl.textContent = (currentCount + 0.1).toFixed(1) + 'K'; } }); card.querySelector('.btn-edit-admin')?.addEventListener('click', (e) => { e.stopPropagation(); openEditModal(movie); }); card.querySelector('.btn-delete-admin')?.addEventListener('click', (e) => { e.stopPropagation(); deleteMovie(movie.id); }); }
 
         // --- 8. LÓGICA DE EDICIÓN Y BORRADO (ADMIN) --- (Sin cambios)
-        function openEditModal(movie) {
-            document.getElementById('editMovieId').value = movie.id; document.getElementById('editVideoUrl').value = movie.video_url || ''; document.getElementById('editCoverUrl').value = movie.cover_url || ''; document.getElementById('editTitle').value = movie.title || ''; document.getElementById('editYear').value = movie.year || ''; document.getElementById('editGenre').value = movie.genre || ''; document.getElementById('editDescription').value = movie.description || '';
-            editCoverFileInput.value = ''; editCoverPreview.src = movie.cover_url || ''; editCoverPreview.style.display = movie.cover_url ? 'block' : 'none'; hideError(editError); openModal('editModal');
-        }
+        function openEditModal(movie) { document.getElementById('editMovieId').value = movie.id; document.getElementById('editVideoUrl').value = movie.video_url || ''; document.getElementById('editCoverUrl').value = movie.cover_url || ''; document.getElementById('editTitle').value = movie.title || ''; document.getElementById('editYear').value = movie.year || ''; document.getElementById('editGenre').value = movie.genre || ''; document.getElementById('editDescription').value = movie.description || ''; editCoverFileInput.value = ''; editCoverPreview.src = movie.cover_url || ''; editCoverPreview.style.display = movie.cover_url ? 'block' : 'none'; hideError(editError); openModal('editModal'); }
         editCoverFileInput.addEventListener('change', (e) => { const file = e.target.files[0]; if (file) { const reader = new FileReader(); reader.onload = (event) => { editCoverPreview.src = event.target.result; editCoverPreview.style.display = 'block'; }; reader.readAsDataURL(file); } else { const originalUrl = document.getElementById('editCoverUrl').value; editCoverPreview.src = originalUrl || ''; editCoverPreview.style.display = originalUrl ? 'block' : 'none'; } });
-        editForm.addEventListener('submit', async (e) => {
-            e.preventDefault(); if (!isAdmin) return; saveChangesBtn.disabled = true; showLoader(editLoader); hideError(editError);
-            const movieId = document.getElementById('editMovieId').value; const coverFile = editCoverFileInput.files[0]; let newCoverUrl = document.getElementById('editCoverUrl').value;
-            try {
-                if (coverFile) { const { presignedUrl, publicUrl } = await getUploadUrl('get-image-presigned-url', coverFile); await uploadFileWithProgress(presignedUrl, coverFile, () => {}); newCoverUrl = publicUrl; }
-                const updates = { title: document.getElementById('editTitle').value, year: document.getElementById('editYear').value || null, genre: document.getElementById('editGenre').value || null, description: document.getElementById('editDescription').value || null, cover_url: newCoverUrl || null };
-                const { error } = await supabaseClient.from('movies').update(updates).eq('id', movieId); if (error) throw error;
-                alert('Película actualizada.'); closeModal('editModal'); loadMovies();
-            } catch (error) { console.error("Error al guardar:", error); showError(editError, `Error: ${error.message}`); }
-            finally { saveChangesBtn.disabled = false; hideLoader(editLoader); }
-        });
-        async function deleteMovie(movieId) {
-             if (!isAdmin) return; const movieCard = document.querySelector(`[data-movie-id="${movieId}"]`); const movieTitle = movieCard?.querySelector('.movie-title')?.textContent || 'esta película';
-             if (!confirm(`¿Eliminar "${movieTitle}" de la base de datos?\n\n¡Los archivos en R2 NO se borrarán!`)) { return; }
-             try { const { error } = await supabaseClient.from('movies').delete().eq('id', movieId); if (error) throw error; alert('Película eliminada de la base de datos.'); movieCard?.remove(); }
-             catch (error) { console.error("Error al borrar de DB:", error); alert(`Error al eliminar: ${error.message}`); }
-        }
+        editForm.addEventListener('submit', async (e) => { e.preventDefault(); if (!isAdmin) return; saveChangesBtn.disabled = true; showLoader(editLoader); hideError(editError); const movieId = document.getElementById('editMovieId').value; const coverFile = editCoverFileInput.files[0]; let newCoverUrl = document.getElementById('editCoverUrl').value; try { if (coverFile) { const { presignedUrl, publicUrl } = await getUploadUrl('get-image-presigned-url', coverFile); await uploadFileWithProgress(presignedUrl, coverFile, () => {}); newCoverUrl = publicUrl; } const updates = { title: document.getElementById('editTitle').value, year: document.getElementById('editYear').value || null, genre: document.getElementById('editGenre').value || null, description: document.getElementById('editDescription').value || null, cover_url: newCoverUrl || null }; const { error } = await supabaseClient.from('movies').update(updates).eq('id', movieId); if (error) throw error; alert('Película actualizada.'); closeModal('editModal'); loadMovies(); } catch (error) { console.error("Error al guardar:", error); showError(editError, `Error: ${error.message}`); } finally { saveChangesBtn.disabled = false; hideLoader(editLoader); } });
+        async function deleteMovie(movieId) { if (!isAdmin) return; const movieCard = document.querySelector(`[data-movie-id="${movieId}"]`); const movieTitle = movieCard?.querySelector('.movie-title')?.textContent || 'esta película'; if (!confirm(`¿Eliminar "${movieTitle}" de la base de datos?\n\n¡Los archivos en R2 NO se borrarán!`)) { return; } try { const { error } = await supabaseClient.from('movies').delete().eq('id', movieId); if (error) throw error; alert('Película eliminada de la base de datos.'); movieCard?.remove(); } catch (error) { console.error("Error al borrar de DB:", error); alert(`Error al eliminar: ${error.message}`); } }
 
         // --- 9. BÚSQUEDA --- (Sin cambios)
         searchInput.addEventListener('input', () => { const searchTerm = searchInput.value.toLowerCase().trim(); const allCards = movieGrid.querySelectorAll('.movie-card'); allCards.forEach(card => { const title = card.getAttribute('data-title') || ''; card.style.display = title.includes(searchTerm) ? 'flex' : 'none'; }); });
