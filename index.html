@@ -14,32 +14,48 @@
         .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
         header { background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(10px); padding: 20px 0; margin-bottom: 30px; border-bottom: 2px solid #ff6b6b; }
         .header-content { display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; }
-        
-        /* --- 1. CSS DEL LOGO MODIFICADO --- */
+
+        /* --- Logo Styling (Increased Size) --- */
         .logo { display: flex; align-items: center; gap: 15px; }
-        .logo i#defaultLogoIcon { 
-            font-size: 2.5rem; 
-            color: #ff6b6b; 
-            display: block; /* Visible por defecto */
-        }
-        .logo img#siteLogo { 
-            height: 40px; /* Altura fija para tu logo */
-            width: auto; 
-            max-width: 150px; /* Evita que sea demasiado ancho */
-            border-radius: 8px; 
-            display: none; /* Oculto por defecto */
-        }
+        .logo i#defaultLogoIcon { font-size: 2.5rem; color: #ff6b6b; display: block; }
+        .logo img#siteLogo { height: 80px; width: auto; max-width: 250px; border-radius: 8px; display: none; }
         .logo h1 { font-size: 2.2rem; font-weight: 700; background: linear-gradient(45deg, #ff6b6b, #4ecdc4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        
+
         .search-bar { position: relative; flex-grow: 1; max-width: 500px; min-width: 200px; }
         .search-bar i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #aaa; }
         .search-bar input { width: 100%; padding: 12px 12px 12px 40px; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 50px; color: white; font-size: 1rem; outline: none; transition: all 0.3s ease; }
         .search-bar input:focus { border-color: #ff6b6b; box-shadow: 0 0 15px rgba(255, 107, 107, 0.3); }
-        .header-actions { display: flex; align-items: center; gap: 15px; } 
-        .upload-btn, .profile-btn { background: linear-gradient(45deg, #ff6b6b, #ff8e8e); color: white; border: none; padding: 12px 20px; font-size: 1.1rem; font-weight: 600; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; gap: 10px; flex-shrink: 0; white-space: nowrap; }
-        .profile-btn { background: linear-gradient(45deg, #4ecdc4, #6aede1); padding: 12px 15px; } 
-        .upload-btn:hover, .profile-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(255, 107, 107, 0.4); }
-        .profile-btn:hover { box-shadow: 0 10px 25px rgba(78, 205, 196, 0.4); }
+
+        /* --- Header Buttons Styling (Professional Icons) --- */
+        .header-actions { display: flex; align-items: center; gap: 15px; }
+        .icon-btn { /* Replaced common styles for upload/profile */
+            background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+            color: white;
+            border: none;
+            padding: 10px 12px; /* Adjusted padding for icon */
+            font-size: 1.2rem; /* Slightly larger icon */
+            border-radius: 50%; /* Make it circular */
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center; /* Center icon */
+            width: 44px; /* Fixed width */
+            height: 44px; /* Fixed height */
+            flex-shrink: 0;
+        }
+        .icon-btn.profile-btn { /* Specific color for profile */
+             background: linear-gradient(45deg, #4ecdc4, #6aede1);
+        }
+        .icon-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(255, 107, 107, 0.4);
+        }
+        .icon-btn.profile-btn:hover {
+            box-shadow: 0 10px 25px rgba(78, 205, 196, 0.4);
+        }
+
+        /* --- Rest of the CSS (No changes below unless specified) --- */
 
         /* Estilos del contenido principal y tarjetas */
         .main-content { display: grid; grid-template-columns: 1fr; gap: 30px; margin-bottom: 40px; }
@@ -68,9 +84,9 @@
             position: absolute;
             top: 10px;
             right: 10px;
-            z-index: 3; 
-            display: none; 
-            gap: 8px; 
+            z-index: 3;
+            display: none;
+            gap: 8px;
             background: rgba(0,0,0,0.7);
             padding: 8px;
             border-radius: 5px;
@@ -80,7 +96,7 @@
             border: none;
             color: white;
             cursor: pointer;
-            font-size: 1rem; 
+            font-size: 1rem;
             padding: 5px;
             line-height: 1;
             transition: color 0.2s ease;
@@ -127,13 +143,13 @@
             margin-top: 5px;
         }
         .progress-bar-fill {
-            width: 0%; 
+            width: 0%;
             height: 100%;
             background: linear-gradient(45deg, #4ecdc4, #6aede1);
-            transition: width 0.2s ease-out; 
+            transition: width 0.2s ease-out;
         }
         #progressContainer {
-            display: none; 
+            display: none;
             margin-bottom: 15px;
         }
         #progressText {
@@ -144,45 +160,45 @@
             margin-top: 5px;
             font-weight: 600;
         }
-        
+
         /* Footer y Scrollbar */
         footer { text-align: center; padding: 30px 20px; color: #aaa; border-top: 1px solid rgba(255, 255, 255, 0.1); margin-top: 20px; }
         .developer-info { margin-top: 10px; font-style: italic; color: #4ecdc4; }
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.2); border-radius: 4px; }
         ::-webkit-scrollbar-thumb { background: linear-gradient(45deg, #ff6b6b, #4ecdc4); border-radius: 4px; }
-        
-        /* --- 2. CSS RESPONSIVO (Tu código ya era bueno, solo ajusté el logo) --- */
+
+        /* --- CSS RESPONSIVO (Ajustado) --- */
         @media (max-width: 768px) {
             .header-content { flex-direction: column; gap: 15px; }
             .search-bar { max-width: 90%; width: 100%; order: 2; }
-            .header-actions { width: 90%; justify-content: space-around; order: 3; }
+            .header-actions { width: 90%; justify-content: center; /* Centrar botones icono */ order: 3; gap: 25px; /* Más espacio entre iconos */ }
             .logo { order: 1; }
             .movie-grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
             .movie-player { aspect-ratio: 16 / 9; }
         }
         @media (max-width: 480px) {
-            .logo { 
-                flex-direction: column; /* Apila el logo y el texto */
-                gap: 5px; 
-                text-align: center; 
+            .logo {
+                flex-direction: column;
+                gap: 5px;
+                text-align: center;
             }
-            .logo i#defaultLogoIcon { 
-                font-size: 2rem; /* Reduce el icono por defecto */
+            .logo i#defaultLogoIcon {
+                font-size: 2rem;
             }
-            .logo img#siteLogo { 
-                height: 35px; /* Reduce el logo subido */
+            .logo img#siteLogo {
+                height: 60px; /* Logo móvil más grande */
             }
-            .logo h1 { font-size: 1.8rem; } /* El texto ya se achicaba, bien */
-            
-            .movie-grid { grid-template-columns: 1fr; } /* Columna única para películas */
+            .logo h1 { font-size: 1.8rem; }
+
+            .movie-grid { grid-template-columns: 1fr; }
             .section-title { font-size: 1.6rem; }
             .modal-content { margin: 10% auto; padding: 20px;}
             .modal-title { font-size: 1.5rem; }
-            .header-actions { flex-direction: column; gap: 10px; align-items: center; } /* Botones apilados */
-            .upload-btn, .profile-btn { width: 80%; justify-content: center;}
+            /* Los botones de icono ya se ven bien, no necesitan apilarse */
+            .header-actions { flex-direction: row; } /* Mantener en fila */
+            .upload-btn, .profile-btn { width: auto; } /* Ancho automático para iconos */
         }
-
     </style>
 </head>
 <body > <div class="container">
@@ -198,15 +214,14 @@
                     <i class="fas fa-search"></i>
                     <input type="text" id="searchInput" placeholder="Buscar película por título...">
                 </div>
+
                 <div class="header-actions">
-                    <button class="upload-btn" id="openUploadModal">
+                    <button class="icon-btn" id="openUploadModal" title="Subir Película">
                         <i class="fas fa-upload"></i>
-                        <span>Subir Película</span>
-                    </button>
-                    <button class="profile-btn" id="openAuthModal">
+                        </button>
+                    <button class="icon-btn profile-btn" id="openAuthModal" title="Perfil / Login">
                         <i class="fas fa-user-circle"></i>
-                        <span id="authBtnText">Login</span>
-                    </button>
+                        </button>
                 </div>
             </div>
         </header>
@@ -270,7 +285,6 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="form-group" id="progressContainer">
                     <label id="progressLabel">Subiendo...</label>
                     <div class="progress-bar-background">
@@ -278,7 +292,6 @@
                     </div>
                     <span id="progressText">0%</span>
                 </div>
-                
                 <button type="submit" class="submit-btn" id="submitUploadBtn">
                     <i class="fas fa-upload"></i> Subir Película
                     <span id="uploadLoader" class="loader" style="display: none;"></span>
@@ -346,8 +359,8 @@
         const SUPABASE_URL = 'https://fcpczyohzcgulbfpthuc.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZjcGN6eW9oemNndWxiZnB0aHVjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE0MDA4NzksImV4cCI6MjA3Njk3Njg3OX0.Ya3sJ2Hb0gr8pCg5CEheMDWGjSCAuPeoNcfANUTuwPk';
         const ADMIN_EMAIL = 'klmzr230@gmail.com';
-        const LOGO_BUCKET = 'assets'; // El nombre del bucket que creaste
-        const LOGO_FILE_PATH = 'public/site_logo.png'; // Ruta fija para el logo
+        const LOGO_BUCKET = 'assets';
+        const LOGO_FILE_PATH = 'public/site_logo.png';
 
         const { createClient } = supabase;
         const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -357,7 +370,7 @@
         const uploadModal = document.getElementById('uploadModal');
         const editModal = document.getElementById('editModal');
         const authContainer = document.getElementById('authContainer');
-        const authBtnText = document.getElementById('authBtnText');
+        //const authBtnText = document.getElementById('authBtnText'); // Ya no se usa para mostrar texto
         const movieGrid = document.getElementById('movieGrid');
         const uploadForm = document.getElementById('uploadForm');
         const editForm = document.getElementById('editForm');
@@ -375,14 +388,10 @@
         const editError = document.getElementById('editError');
         const searchInput = document.getElementById('searchInput');
         const modalAuthError = document.getElementById('modalAuthError');
-        
-        // Referencias para la barra de progreso
         const progressContainer = document.getElementById('progressContainer');
         const progressLabel = document.getElementById('progressLabel');
         const progressBarFill = document.getElementById('progressBarFill');
         const progressText = document.getElementById('progressText');
-
-        // **NUEVAS REFERENCIAS PARA EL LOGO**
         const siteLogo = document.getElementById('siteLogo');
         const defaultLogoIcon = document.getElementById('defaultLogoIcon');
 
@@ -398,33 +407,25 @@
         function hideError(errorElement) { errorElement.style.display = 'none'; }
 
         // --- 4. LÓGICA DE AUTENTICACIÓN Y LOGO ---
-        
-        // **NUEVA FUNCIÓN PARA CARGAR EL LOGO**
         async function loadLogo() {
             const { data } = supabaseClient.storage
                 .from(LOGO_BUCKET)
                 .getPublicUrl(LOGO_FILE_PATH);
 
             if (data && data.publicUrl) {
-                // Usamos un truco anti-caché para mostrar siempre el logo más nuevo
                 const logoUrlWithCacheBust = `${data.publicUrl}?t=${new Date().getTime()}`;
-                
-                // Verificamos si la imagen existe antes de mostrarla
                 const img = new Image();
                 img.onload = () => {
-                    // Si la imagen carga, la mostramos
                     siteLogo.src = logoUrlWithCacheBust;
                     siteLogo.style.display = 'block';
                     defaultLogoIcon.style.display = 'none';
                 };
                 img.onerror = () => {
-                    // Si falla (ej. 404), mostramos el icono por defecto
                     siteLogo.style.display = 'none';
                     defaultLogoIcon.style.display = 'block';
                 };
                 img.src = logoUrlWithCacheBust;
             } else {
-                // No hay URL, mostrar el icono
                 siteLogo.style.display = 'none';
                 defaultLogoIcon.style.display = 'block';
             }
@@ -442,22 +443,19 @@
                 isAdmin = false;
             } finally {
                 updateUIBasedOnAuth();
-                loadMovies(); 
-                loadLogo(); // << CARGAMOS EL LOGO AL INICIAR
+                loadMovies();
+                loadLogo();
             }
         }
 
         function updateUIBasedOnAuth() {
-            authBtnText.textContent = currentUser ? 'Perfil' : 'Login';
+            // Ya no actualizamos texto del botón, pero sí el modo admin
             document.body.classList.toggle('admin-mode', isAdmin);
-            // document.getElementById('openUploadModal').style.display = isAdmin ? 'flex' : 'none'; 
         }
 
-        // **MODIFICADA: renderAuthUI para incluir el botón de subir logo**
         function renderAuthUI() {
             hideError(modalAuthError);
             if (currentUser) {
-                // HTML para las herramientas de admin (subir logo)
                 const adminTools = `
                     <div style="border-top: 1px solid #444; margin-top: 20px; padding-top: 20px;">
                         <h3 class="modal-title" style="font-size: 1.4rem; color: #4ecdc4; margin-bottom: 15px;">Herramientas Admin</h3>
@@ -476,15 +474,14 @@
                     <p>Conectado como: <strong>${currentUser.email}</strong></p>
                     ${isAdmin ? '<p style="color: #4ecdc4; font-weight: bold; margin-top: 5px;">Tienes permisos de Administrador.</p>' : ''}
                     <button id="modalLogoutBtn" class="action-btn" style="margin-top: 20px; width: 100%;">Cerrar Sesión</button>
-                    ${isAdmin ? adminTools : ''} `;
+                    ${isAdmin ? adminTools : ''}
+                `;
                 document.getElementById('modalLogoutBtn').addEventListener('click', handleLogout);
-                
-                // Si es admin, añadir el listener para el input del logo
+
                 if (isAdmin) {
                     document.getElementById('logoUploadInput').addEventListener('change', handleLogoUpload);
                 }
             } else {
-                // ... (código de login sin cambios) ...
                 authContainer.innerHTML = `
                     <div class="modal-header"><h2 class="modal-title">Iniciar Sesión</h2></div>
                     <form id="loginForm">
@@ -505,7 +502,6 @@
             }
         }
 
-        // **NUEVA FUNCIÓN: handleLogoUpload**
         async function handleLogoUpload(e) {
             const file = e.target.files[0];
             const statusEl = document.getElementById('logoUploadStatus');
@@ -513,42 +509,27 @@
                 statusEl.textContent = 'No se seleccionó archivo.';
                 return;
             }
-
             statusEl.textContent = 'Subiendo logo...';
-            
             try {
-                // 1. Subir a Supabase Storage (sobrescribiendo el anterior)
                 const { error: uploadError } = await supabaseClient.storage
                     .from(LOGO_BUCKET)
-                    .upload(LOGO_FILE_PATH, file, {
-                        cacheControl: '3600',
-                        upsert: true // Sobrescribe el logo anterior
-                    });
-
+                    .upload(LOGO_FILE_PATH, file, { cacheControl: '3600', upsert: true });
                 if (uploadError) throw uploadError;
-
-                // 2. Obtener la URL pública (con truco anti-caché)
                 const { data: publicData } = supabaseClient.storage
                     .from(LOGO_BUCKET)
                     .getPublicUrl(LOGO_FILE_PATH);
-                
                 const logoUrlWithBust = `${publicData.publicUrl}?t=${new Date().getTime()}`;
-
-                // 3. Actualizar la UI inmediatamente
                 siteLogo.src = logoUrlWithBust;
                 siteLogo.style.display = 'block';
                 defaultLogoIcon.style.display = 'none';
-
                 statusEl.textContent = '¡Logo actualizado!';
                 alert('Logo actualizado.');
                 closeModal('authModal');
-
             } catch (error) {
                 console.error("Error subiendo logo:", error);
                 statusEl.textContent = `Error: ${error.message}`;
             }
         }
-
 
         document.getElementById('openAuthModal').addEventListener('click', () => {
             renderAuthUI();
@@ -565,11 +546,9 @@
             const password = document.getElementById('modalPassword').value;
             const loginBtn = document.getElementById('modalLoginBtn');
             const loader = document.getElementById('authLoader');
-
             hideError(modalAuthError);
             showLoader(loader);
             loginBtn.disabled = true;
-
             try {
                 const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
                 if (error) throw error;
@@ -578,7 +557,8 @@
                     isAdmin = currentUser.email === ADMIN_EMAIL;
                     updateUIBasedOnAuth();
                     closeModal('authModal');
-                    loadMovies(); 
+                    loadMovies();
+                    loadLogo(); // Cargar logo al loguearse como admin
                     alert(`¡Bienvenido ${isAdmin ? 'Admin' : ''}!`);
                 } else {
                      throw new Error("No se recibieron datos de usuario.");
@@ -602,7 +582,7 @@
                  updateUIBasedOnAuth();
                  closeModal('authModal');
                  loadMovies();
-                 loadLogo(); // Recargar el logo por si acaso (vuelve al icono)
+                 loadLogo(); // Cargar icono por defecto al cerrar sesión
                  alert('Sesión cerrada.');
              }
         }
@@ -611,7 +591,6 @@
         uploadForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const submitBtnText = submitUploadBtn.innerHTML;
-
             const videoFile = videoFileInput.files[0];
             const coverFile = coverFileInput.files[0];
             const title = document.getElementById('movieTitle').value;
@@ -624,72 +603,56 @@
             }
             hideError(uploadError);
             submitUploadBtn.disabled = true;
-            hideLoader(uploadLoader); 
-            
-            progressContainer.style.display = 'none'; 
+            hideLoader(uploadLoader);
+            progressContainer.style.display = 'none';
             progressBarFill.style.width = '0%';
             progressText.textContent = '0%';
-
             let coverPublicUrl = null;
             let videoPublicUrl = null;
-
             try {
-                // Subir Portada (es rápida)
                 if (coverFile) {
                     submitUploadBtn.firstElementChild.className = 'fas fa-image';
                     submitUploadBtn.lastChild.textContent = ' Subiendo Portada...';
                     const { presignedUrl, publicUrl } = await getUploadUrl('get-image-presigned-url', coverFile);
-                    await uploadFileWithProgress(presignedUrl, coverFile, () => {}); 
+                    await uploadFileWithProgress(presignedUrl, coverFile, () => {});
                     coverPublicUrl = publicUrl;
                 }
-
-                // Obtener URL para Video
                 submitUploadBtn.firstElementChild.className = 'fas fa-lock';
                 submitUploadBtn.lastChild.textContent = ' Autorizando Video...';
                 const { presignedUrl: videoPresignedUrl, publicUrl: vidPublicUrl } = await getUploadUrl('get-presigned-url', videoFile);
                 videoPublicUrl = vidPublicUrl;
-
-                // Subir Video
                 submitUploadBtn.firstElementChild.className = 'fas fa-spinner fa-spin';
                 submitUploadBtn.lastChild.textContent = ' Subiendo Video...';
                 progressContainer.style.display = 'block';
                 progressLabel.textContent = `Subiendo: ${videoFile.name}`;
-
                 const onVideoProgress = (percent, loaded, total) => {
                     const loadedMB = (loaded / 1024 / 1024).toFixed(1);
                     const totalMB = (total / 1024 / 1024).toFixed(1);
-                    
                     progressBarFill.style.width = `${percent.toFixed(2)}%`;
                     progressText.textContent = `${percent.toFixed(0)}% (${loadedMB} MB / ${totalMB} MB)`;
                 };
-
                 await uploadFileWithProgress(videoPresignedUrl, videoFile, onVideoProgress);
-
-                // Guardar en DB
                 submitUploadBtn.firstElementChild.className = 'fas fa-database';
                 submitUploadBtn.lastChild.textContent = ' Guardando datos...';
                 const { data: movieData, error: dbError } = await supabaseClient
                     .from('movies')
                     .insert({ title, year: parseInt(year), genre, description, video_url: videoPublicUrl, cover_url: coverPublicUrl })
                     .select().single();
-
                 if (dbError) throw dbError;
                 if (!movieData) throw new Error("No se recibieron datos al guardar.");
-
                 alert('¡Película subida! 🎉');
                 closeModal('uploadModal');
                 uploadForm.reset();
                 fileLabelText.textContent = 'Selecciona tu archivo de video (.mp4)';
                 coverPreview.style.display = 'none';
                 addMovieCardToGrid(movieData);
-
             } catch (error) {
                 console.error('Error en subida:', error);
                 showError(uploadError, `Error: ${error.message}`);
             } finally {
                 submitUploadBtn.disabled = false;
-                submitUploadBtn.innerHTML = submitBtnText; 
-                progressContainer.style.display = 'none'; 
+                submitUploadBtn.innerHTML = submitBtnText;
+                progressContainer.style.display = 'none';
                 progressBarFill.style.width = '0%';
                 progressText.textContent = '0%';
             }
@@ -714,16 +677,13 @@
             return new Promise((resolve, reject) => {
                 const xhr = new XMLHttpRequest();
                 xhr.open('PUT', presignedUrl);
-                
                 xhr.setRequestHeader('Content-Type', file.type || 'application/octet-stream');
-
                 xhr.upload.onprogress = (event) => {
                     if (event.lengthComputable) {
                         const percent = (event.loaded / event.total) * 100;
-                        onProgress(percent, event.loaded, event.total); 
+                        onProgress(percent, event.loaded, event.total);
                     }
                 };
-
                 xhr.onload = () => {
                     if (xhr.status >= 200 && xhr.status < 300) {
                         resolve(xhr.response);
@@ -733,15 +693,12 @@
                         reject(new Error(`Falló subida a R2 (${file.name}): ${r2Message}.`));
                     }
                 };
-
                 xhr.onerror = () => {
                     reject(new Error('Error de red durante la subida.'));
                 };
-
                 xhr.send(file);
             });
         }
-
 
          // Preview de portada en modal de subida
         coverFileInput.addEventListener('change', (e) => {
@@ -755,7 +712,7 @@
                 reader.readAsDataURL(file);
             } else {
                 coverPreview.style.display = 'none';
-                coverPreview.src = ''; 
+                coverPreview.src = '';
             }
         });
 
@@ -767,11 +724,8 @@
                     .from('movies')
                     .select('*')
                     .order('created_at', { ascending: false });
-
-                movieGrid.innerHTML = ''; 
-
+                movieGrid.innerHTML = '';
                 if (error) throw error;
-
                 if (movies.length === 0) {
                     movieGrid.innerHTML = '<p style="text-align: center; grid-column: 1 / -1;">Aún no hay películas. ¡Sube la primera! 🚀</p>';
                 } else {
@@ -791,11 +745,9 @@
             card.className = 'movie-card';
             card.setAttribute('data-movie-id', movie.id);
             card.setAttribute('data-title', movie.title.toLowerCase());
-
             const likes = ((movie.likes || 0) / 1000).toFixed(1) + 'K';
             const views = ((movie.views || 0) / 1000).toFixed(1) + 'K';
             const coverImage = movie.cover_url ? `<img src="${movie.cover_url}" alt="Portada" class="movie-cover">` : '';
-
             card.innerHTML = `
                 <div class="movie-player">
                     ${coverImage}
@@ -824,8 +776,8 @@
                     </div>
                 </div>
             `;
-            addCardListeners(card, movie); 
-            movieGrid.appendChild(card); 
+            addCardListeners(card, movie);
+            movieGrid.appendChild(card);
         }
 
         // --- 7. LISTENERS DE TARJETAS (PLAY, LIKE, ADMIN) ---
@@ -833,26 +785,21 @@
             const playButton = card.querySelector('.play-button');
             const video = card.querySelector('video');
             const cover = card.querySelector('.movie-cover');
-
-            playButton?.addEventListener('click', () => { 
-                // Esta es la corrección que hicimos antes (funciona)
-                if (cover) cover.style.display = 'none'; 
+            playButton?.addEventListener('click', () => {
+                if (cover) cover.style.display = 'none';
                 if (playButton) playButton.style.display = 'none';
                 if (video) {
                     video.style.display = 'block';
                     video.play();
                 }
             });
-
             video?.addEventListener('ended', () => {
-                 if (cover) cover.style.display = 'block'; 
+                 if (cover) cover.style.display = 'block';
                  if (playButton) playButton.style.display = 'block';
                  if (video) { video.style.display = 'none'; video.currentTime = 0; }
             });
-
-            // El listener del botón "Like" (funciona)
             const likeButton = card.querySelector('.like-btn');
-            likeButton?.addEventListener('click', function() { 
+            likeButton?.addEventListener('click', function() {
                 const icon = this.querySelector('i');
                 const countEl = this.querySelector('span');
                 let currentCount = parseFloat(countEl.textContent) || 0;
@@ -864,13 +811,11 @@
                     countEl.textContent = (currentCount + 0.1).toFixed(1) + 'K';
                 }
             });
-
-            // Listeners Admin
             card.querySelector('.btn-edit-admin')?.addEventListener('click', (e) => {
                 e.stopPropagation(); openEditModal(movie);
             });
             card.querySelector('.btn-delete-admin')?.addEventListener('click', (e) => {
-                e.stopPropagation(); deleteMovie(movie.id); 
+                e.stopPropagation(); deleteMovie(movie.id);
             });
         }
 
@@ -883,14 +828,14 @@
             document.getElementById('editYear').value = movie.year || '';
             document.getElementById('editGenre').value = movie.genre || '';
             document.getElementById('editDescription').value = movie.description || '';
-            editCoverFileInput.value = ''; 
+            editCoverFileInput.value = '';
             editCoverPreview.src = movie.cover_url || '';
             editCoverPreview.style.display = movie.cover_url ? 'block' : 'none';
             hideError(editError);
             openModal('editModal');
         }
 
-        editCoverFileInput.addEventListener('change', (e) => { 
+        editCoverFileInput.addEventListener('change', (e) => {
              const file = e.target.files[0];
             if (file) {
                 const reader = new FileReader();
@@ -903,26 +848,21 @@
             }
         });
 
-        editForm.addEventListener('submit', async (e) => { 
+        editForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            if (!isAdmin) return; 
+            if (!isAdmin) return;
             saveChangesBtn.disabled = true;
             showLoader(editLoader);
             hideError(editError);
-
             const movieId = document.getElementById('editMovieId').value;
             const coverFile = editCoverFileInput.files[0];
-            let newCoverUrl = document.getElementById('editCoverUrl').value; 
-
+            let newCoverUrl = document.getElementById('editCoverUrl').value;
             try {
-                // Subir nueva portada si se seleccionó
                 if (coverFile) {
                     const { presignedUrl, publicUrl } = await getUploadUrl('get-image-presigned-url', coverFile);
-                    await uploadFileWithProgress(presignedUrl, coverFile, () => {}); 
-                    newCoverUrl = publicUrl; 
+                    await uploadFileWithProgress(presignedUrl, coverFile, () => {});
+                    newCoverUrl = publicUrl;
                 }
-
-                // Actualizar datos en Supabase
                 const updates = {
                     title: document.getElementById('editTitle').value,
                     year: document.getElementById('editYear').value || null,
@@ -932,11 +872,9 @@
                 };
                 const { error } = await supabaseClient.from('movies').update(updates).eq('id', movieId);
                 if (error) throw error;
-
                 alert('Película actualizada.');
                 closeModal('editModal');
-                loadMovies(); 
-
+                loadMovies();
             } catch (error) {
                 console.error("Error al guardar:", error);
                 showError(editError, `Error: ${error.message}`);
@@ -951,16 +889,14 @@
              if (!isAdmin) return;
              const movieCard = document.querySelector(`[data-movie-id="${movieId}"]`);
              const movieTitle = movieCard?.querySelector('.movie-title')?.textContent || 'esta película';
-
              if (!confirm(`¿Eliminar "${movieTitle}" de la base de datos?\n\n¡Los archivos en R2 NO se borrarán!`)) {
                  return;
              }
-
              try {
                  const { error } = await supabaseClient.from('movies').delete().eq('id', movieId);
                  if (error) throw error;
                  alert('Película eliminada de la base de datos.');
-                 movieCard?.remove(); // Quitar del DOM
+                 movieCard?.remove();
              } catch (error) {
                  console.error("Error al borrar de DB:", error);
                  alert(`Error al eliminar: ${error.message}`);
